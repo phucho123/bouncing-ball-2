@@ -1,3 +1,4 @@
+import Phaser from 'phaser'
 import { GameOverScene } from './GameOverScene'
 import { PlayScene } from './PlayScene'
 import { StartScene } from './StartScene'

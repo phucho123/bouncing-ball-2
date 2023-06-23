@@ -18,7 +18,6 @@ export class PlayScene extends Phaser.Scene {
     private scoreDisplay: Phaser.GameObjects.Text
     private timeToChangeColor: number
     private colorIndex: number
-    // private particals: Phaser.GameObjects.Container
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -58,17 +57,23 @@ export class PlayScene extends Phaser.Scene {
             this.createFloor(i * 200, 400, 1)
         }
 
-        this.ball.setCircle(this.ball.width / 2)
-        this.ball.setFriction(0.005)
-        this.ball.setBounce(1)
-        this.ball.setMass(3)
-        this.ball.setPosition(this.floors[0].x, this.floors[0].y - this.floors[0].height / 2 - 300)
+        this.ball
+            .setCircle(this.ball.width / 2)
+            .setFriction(0.005)
+            .setBounce(1)
+            .setMass(3)
+            .setDepth(2)
+            .setPosition(this.floors[0].x, this.floors[0].y - this.floors[0].height / 2 - 300)
+            .setOnCollide(() => {
+                this.ball.setVelocity(0, this.jumpSpeed)
+                this.score++
+                this.timeToChangeColor--
+                this.start = true
+            })
 
         this.input.on('pointerdown', () => {
             if (!this.gameOver) this.ball.setVelocity(0, this.fallSpeed)
         })
-
-        this.ball.setDepth(2)
 
         this.scoreDisplay = this.add
             .text(200, 100, `${this.score}`, {
@@ -80,13 +85,6 @@ export class PlayScene extends Phaser.Scene {
             .setStroke('black', 1)
             .setAlpha(0.5)
         this.scoreDisplay.setX(this.scoreDisplay.x - this.scoreDisplay.width / 2)
-
-        this.ball.setOnCollide(() => {
-            this.ball.setVelocity(0, this.jumpSpeed)
-            this.score++
-            this.timeToChangeColor--
-            this.start = true
-        })
     }
 
     update() {
@@ -108,7 +106,6 @@ export class PlayScene extends Phaser.Scene {
     createFloor(x: number | null, y: number, scaleX: number) {
         let newFloor: Phaser.Physics.Matter.Image | undefined
         if (this.extraFloors.length) {
-            // console.log(this.extraFloors.length)
             newFloor = this.extraFloors.shift()
         } else {
             newFloor = this.matter.add.image(200, 100, 'floor')
@@ -122,19 +119,12 @@ export class PlayScene extends Phaser.Scene {
         }
 
         if (newFloor) {
-            newFloor.setStatic(true)
-            newFloor.setY(y)
+            newFloor.setStatic(true).setY(y)
             if (x == null) newFloor.setX(400 + newFloor.displayWidth / 2)
             else newFloor.setX(x)
             newFloor.scaleX = scaleX
             newFloor.active = true
             this.floors.push(newFloor)
-
-            // this.ball.setOnCollideWith(newFloor, () => {
-            //     this.ball.setVelocity(0, this.jumpSpeed)
-            //     this.score++
-            //     this.timeToChangeColor--
-            // })
 
             this.createPipe(
                 newFloor.x,
@@ -158,8 +148,7 @@ export class PlayScene extends Phaser.Scene {
         if (newPipe) {
             newPipe.displayWidth = width
             newPipe.displayHeight = height
-            newPipe.setX(x)
-            newPipe.setY(y)
+            newPipe.setPosition(x, y)
             newPipe.fillColor = this.colors[this.colorIndex]
 
             this.pipes.push(newPipe)
@@ -183,7 +172,6 @@ export class PlayScene extends Phaser.Scene {
             onComplete: () => {
                 this.scene.start('Game Over Scene')
                 GameOverScene.score = this.score
-                // this.restart()
             },
         })
     }

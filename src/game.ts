@@ -1,10 +1,9 @@
-import Phaser from 'phaser'
-import { config } from './bouncing-ball/config'
+import { GameManager } from './bouncing-ball/GameManager'
 
 class Game {
     constructor() {
         console.log('Game created')
-        new Phaser.Game(config)
+        new GameManager()
     }
 }
 
