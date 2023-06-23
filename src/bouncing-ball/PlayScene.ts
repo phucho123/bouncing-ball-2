@@ -14,10 +14,11 @@ export class PlayScene extends Phaser.Scene {
     private floorSpeed: number
     private fallSpeed: number
     private jumpSpeed: number
-    public score: number
+    private score: number
     private scoreDisplay: Phaser.GameObjects.Text
     private timeToChangeColor: number
     private colorIndex: number
+    // private particals: Phaser.GameObjects.Container
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -30,6 +31,8 @@ export class PlayScene extends Phaser.Scene {
     }
 
     create() {
+        this.matter.world.setBounds(0, 0, 400, 600, 32, false, false, false, false)
+        this.matter.world.setGravity(0, 0.3)
         this.clearObject()
         if (this.colors == undefined)
             this.colors = [0x8cff66, 0x668cff, 0xff8533, 0xdf80ff, 0xff3333]
@@ -44,8 +47,6 @@ export class PlayScene extends Phaser.Scene {
 
         this.timeToSpawnPipe = 100
         this.cnt = this.timeToSpawnPipe
-        this.matter.world.setBounds(0, 0, 400, 600, 32, false, false, false, false)
-        this.matter.world.setGravity(0, 0.3)
 
         this.ball = this.matter.add.image(
             Phaser.Math.Between(100, 700),
@@ -79,6 +80,13 @@ export class PlayScene extends Phaser.Scene {
             .setStroke('black', 1)
             .setAlpha(0.5)
         this.scoreDisplay.setX(this.scoreDisplay.x - this.scoreDisplay.width / 2)
+
+        this.ball.setOnCollide(() => {
+            this.ball.setVelocity(0, this.jumpSpeed)
+            this.score++
+            this.timeToChangeColor--
+            this.start = true
+        })
     }
 
     update() {
@@ -93,49 +101,27 @@ export class PlayScene extends Phaser.Scene {
         if (this.start) {
             this.spawnObject()
 
-            this.handleCollision()
-        } else {
-            this.ball.setOnCollideWith(this.floors[0], () => {
-                if (
-                    this.floors[0].y - this.ball.y >=
-                    this.floors[0].displayHeight / 2 + this.ball.displayHeight / 2 - 10
-                ) {
-                    this.floors[0].active = false
-                    this.ball.setVelocity(0, this.jumpSpeed)
-                    this.start = true
-                    this.score++
-                    this.timeToChangeColor--
-                } else {
-                    console.log('Game Over')
-                    this.gameOver = true
-                }
-            })
+            this.moveFloor()
         }
     }
 
     createFloor(x: number | null, y: number, scaleX: number) {
+        let newFloor: Phaser.Physics.Matter.Image | undefined
         if (this.extraFloors.length) {
-            console.log(this.extraFloors.length)
-            const newFloor = this.extraFloors.shift()
-            if (newFloor) {
-                newFloor.setStatic(true)
-                newFloor.setY(y)
-                if (x == null) newFloor.setX(400 + newFloor.displayWidth / 2)
-                else newFloor.setX(x)
-                newFloor.scaleX = scaleX
-                newFloor.active = true
-                this.floors.push(newFloor)
-
-                this.createPipe(
-                    newFloor.x,
-                    newFloor.y + newFloor.displayHeight / 2 + 300,
-                    newFloor.displayWidth,
-                    600
-                )
-            }
+            // console.log(this.extraFloors.length)
+            newFloor = this.extraFloors.shift()
         } else {
-            const newFloor = this.matter.add.image(200, 100, 'floor')
+            newFloor = this.matter.add.image(200, 100, 'floor')
 
+            newFloor.setOnCollide(() => {
+                if (newFloor) {
+                    newFloor.active = false
+                }
+            })
+            console.log('create New Floor')
+        }
+
+        if (newFloor) {
             newFloor.setStatic(true)
             newFloor.setY(y)
             if (x == null) newFloor.setX(400 + newFloor.displayWidth / 2)
@@ -144,6 +130,12 @@ export class PlayScene extends Phaser.Scene {
             newFloor.active = true
             this.floors.push(newFloor)
 
+            // this.ball.setOnCollideWith(newFloor, () => {
+            //     this.ball.setVelocity(0, this.jumpSpeed)
+            //     this.score++
+            //     this.timeToChangeColor--
+            // })
+
             this.createPipe(
                 newFloor.x,
                 newFloor.y + newFloor.displayHeight / 2 + 300,
@@ -151,11 +143,7 @@ export class PlayScene extends Phaser.Scene {
                 600
             )
 
-            newFloor.setOnCollide(() => {
-                if (newFloor) newFloor.active = false
-            })
-
-            console.log('create New Floor')
+            // this.createSpike(newFloor.x, newFloor.y - newFloor.height)
         }
     }
 
@@ -177,6 +165,10 @@ export class PlayScene extends Phaser.Scene {
             this.pipes.push(newPipe)
         }
     }
+
+    // createSpike(x: number, y: number) {
+    //     this.add.triangle(x, y - 5, x, y - 10, x - 5, y, x + 5, y, 0xff00ff, 1)
+    // }
 
     createEveryThing() {
         this.createFloor(null, Phaser.Math.Between(300, 500), Phaser.Math.Between(1, 3) / 2)
@@ -229,28 +221,10 @@ export class PlayScene extends Phaser.Scene {
         }
     }
 
-    handleCollision() {
+    moveFloor() {
         for (let i = 0; i < this.floors.length; i++) {
             this.floors[i].setX(this.floors[i].x + this.floorSpeed)
             this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
-
-            this.ball.setOnCollideWith(this.floors[i], () => {
-                if (
-                    this.floors[i].y - this.ball.y >=
-                    this.floors[i].displayHeight / 2 + this.ball.displayHeight / 2 - 10
-                ) {
-                    this.ball.setVelocity(0, this.jumpSpeed)
-                    this.score++
-                    this.timeToChangeColor--
-                } else {
-                    console.log('Game Over')
-                    this.gameOver = true
-                    this.ball.setVelocityY(10)
-                }
-            })
-            this.floors[i].setOnCollide(() => {
-                this.floors[i].active = false
-            })
             if (!this.floors[i].active) {
                 this.floors[i].setY(this.floors[i].y + 2)
                 this.pipes[i].setY(this.pipes[i].y + 2)
@@ -266,13 +240,6 @@ export class PlayScene extends Phaser.Scene {
             this.createEveryThing()
         }
     }
-
-    // restart() {
-    //     this.gameOver = false
-    //     GameOverScene.score = this.score
-    //     this.ball.setPosition(this.floors[0].x, this.floors[0].y - this.floors[0].height / 2 - 300)
-    //     this.start = false
-    // }
 
     clearObject() {
         // if (this.floors) {

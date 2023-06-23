@@ -19,7 +19,7 @@
     "moduleResolution": "node",
     "lib": ["dom", "esnext"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/dunk-shot"],
   "exclude": ["node_modules", "**/*.spec.ts"],
   "typeRoots": [
     "./node_modules/@types",

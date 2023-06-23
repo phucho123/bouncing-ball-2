@@ -14,7 +14,11 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     create() {
-        this.highScore = 0
+        const tmp = localStorage.getItem('highScore')
+        if (tmp != null) {
+            this.highScore = parseInt(tmp)
+        } else this.highScore = 0
+
         this.playAgain = this.add.image(200, 300, 'replay-button').setInteractive().setScale(0.7)
 
         this.scoreDisplay = this.add
@@ -61,7 +65,10 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     update() {
-        this.highScore = Math.max(this.highScore, GameOverScene.score)
+        if (GameOverScene.score > this.highScore) {
+            this.highScore = Math.max(this.highScore, GameOverScene.score)
+            localStorage.setItem('highScore', this.highScore.toString())
+        }
         this.scoreDisplay.setText(`Score: ${GameOverScene.score}`)
         this.highScoreDisplay.setText(`High Score: ${this.highScore}`)
     }
