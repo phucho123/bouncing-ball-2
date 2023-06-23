@@ -1,0 +1,68 @@
+export class GameOverScene extends Phaser.Scene {
+    private playAgain: Phaser.GameObjects.Image
+    static score: number
+    private scoreDisplay: Phaser.GameObjects.Text
+    private highScoreDisplay: Phaser.GameObjects.Text
+    private highScore: number
+
+    constructor() {
+        super({ key: 'Game Over Scene' })
+    }
+
+    preload() {
+        this.load.image('replay-button', 'assets/images/replay-button.png')
+    }
+
+    create() {
+        this.highScore = 0
+        this.playAgain = this.add.image(200, 300, 'replay-button').setInteractive().setScale(0.7)
+
+        this.scoreDisplay = this.add
+            .text(100, 100, `Score: ${GameOverScene.score}`, {
+                fontSize: '32px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                testString: '1234y',
+                align: 'center',
+            })
+            .setStroke('black', 1)
+            .setInteractive()
+
+        this.highScoreDisplay = this.add
+            .text(100, 200, `High Score: ${this.highScore}`, {
+                fontSize: '32px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                testString: '1234y',
+                align: 'center',
+            })
+            .setStroke('black', 1)
+            .setInteractive()
+
+        this.playAgain.on('pointerdown', () => {
+            this.tweens.add({
+                targets: [this.playAgain, this.highScoreDisplay, this.scoreDisplay],
+                duration: 1000,
+                alpha: 0,
+                onComplete: () => {
+                    this.scene.start('Play Scene')
+                },
+            })
+
+            this.tweens.add({
+                targets: [this.playAgain],
+                duration: 1000,
+                scale: 2,
+                onComplete: () => {
+                    this.scene.start('Play Scene')
+                },
+            })
+        })
+    }
+
+    update() {
+        this.highScore = Math.max(this.highScore, GameOverScene.score)
+        this.scoreDisplay.setText(`Score: ${GameOverScene.score}`)
+        this.highScoreDisplay.setText(`High Score: ${this.highScore}`)
+    }
+}

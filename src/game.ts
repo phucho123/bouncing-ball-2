@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { config } from './bouncing-ball/Scene'
+import { config } from './bouncing-ball/config'
 
 class Game {
     constructor() {
