@@ -20,7 +20,7 @@ export class StartScene extends Phaser.Scene {
                 yoyo: false,
                 alpha: 0,
                 onComplete: () => {
-                    this.scene.start('Play Scene')
+                    this.scene.switch('Play Scene')
                 },
             })
 

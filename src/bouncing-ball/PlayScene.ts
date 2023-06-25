@@ -18,6 +18,7 @@ export class PlayScene extends Phaser.Scene {
     private scoreDisplay: Phaser.GameObjects.Text
     private timeToChangeColor: number
     private colorIndex: number
+    private triagle: Phaser.GameObjects.Triangle
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -31,10 +32,12 @@ export class PlayScene extends Phaser.Scene {
 
     create() {
         this.matter.world.setBounds(0, 0, 400, 600, 32, false, false, false, false)
+        this.floors = []
+        this.extraFloors = []
+        this.pipes = []
+        this.extraPipes = []
         this.matter.world.setGravity(0, 0.3)
-        this.clearObject()
-        if (this.colors == undefined)
-            this.colors = [0x8cff66, 0x668cff, 0xff8533, 0xdf80ff, 0xff3333]
+        this.colors = [0x8cff66, 0x668cff, 0xff8533, 0xdf80ff, 0xff3333]
         this.floorSpeed = -2
         this.jumpSpeed = -8
         this.fallSpeed = 8
@@ -44,7 +47,7 @@ export class PlayScene extends Phaser.Scene {
         this.start = false
         this.gameOver = false
 
-        this.timeToSpawnPipe = 100
+        this.timeToSpawnPipe = 70
         this.cnt = this.timeToSpawnPipe
 
         this.ball = this.matter.add.image(
@@ -132,8 +135,9 @@ export class PlayScene extends Phaser.Scene {
                 newFloor.displayWidth,
                 600
             )
-
-            // this.createSpike(newFloor.x, newFloor.y - newFloor.height)
+            if (this.triagle == undefined) {
+                this.createSpike(newFloor.x, newFloor.y - 100)
+            }
         }
     }
 
@@ -155,9 +159,9 @@ export class PlayScene extends Phaser.Scene {
         }
     }
 
-    // createSpike(x: number, y: number) {
-    //     this.add.triangle(x, y - 5, x, y - 10, x - 5, y, x + 5, y, 0xff00ff, 1)
-    // }
+    createSpike(x: number, y: number) {
+        this.triagle = this.add.triangle(x, y - 5, x, y - 10, x - 5, y, x + 5, y, 0xff00ff, 1)
+    }
 
     createEveryThing() {
         this.createFloor(null, Phaser.Math.Between(300, 500), Phaser.Math.Between(1, 3) / 2)
@@ -170,8 +174,9 @@ export class PlayScene extends Phaser.Scene {
             yoyo: false,
             alpha: 0,
             onComplete: () => {
-                this.scene.start('Game Over Scene')
                 GameOverScene.score = this.score
+                this.restart()
+                this.scene.start('Game Over Scene')
             },
         })
     }
@@ -184,7 +189,6 @@ export class PlayScene extends Phaser.Scene {
     }
 
     checkOutOfBound() {
-        console.log(this.ball)
         if (this.ball.y >= this.ball.height / 2 + 600) {
             console.log('Game Over')
             this.gameOver = true
@@ -210,6 +214,7 @@ export class PlayScene extends Phaser.Scene {
     }
 
     moveFloor() {
+        // this.triagle.setX(this.triagle.x + this.floorSpeed)
         for (let i = 0; i < this.floors.length; i++) {
             this.floors[i].setX(this.floors[i].x + this.floorSpeed)
             this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
@@ -229,23 +234,26 @@ export class PlayScene extends Phaser.Scene {
         }
     }
 
-    clearObject() {
-        // if (this.floors) {
-        //     while (this.floors.length) {
-        //         const removeFloor = this.floors.shift()
-        //         if (removeFloor) this.extraFloors.push(removeFloor)
-        //         const removePipe = this.pipes.shift()
-        //         if (removePipe) this.extraPipes.push(removePipe)
-        //     }
-        // } else {
-        //     this.floors = []
-        //     this.extraFloors = []
-        //     this.pipes = []
-        //     this.extraPipes = []
-        // }
-        this.floors = []
-        this.extraFloors = []
-        this.pipes = []
-        this.extraPipes = []
+    restart() {
+        this.score = 0
+        this.timeToChangeColor = 5
+        this.start = false
+        this.gameOver = false
+        this.cnt = this.timeToSpawnPipe
+
+        if (this.floors) {
+            while (this.floors.length) {
+                const removeFloor = this.floors.shift()
+                if (removeFloor) this.extraFloors.push(removeFloor)
+                const removePipe = this.pipes.shift()
+                if (removePipe) this.extraPipes.push(removePipe)
+            }
+        }
+
+        for (let i = 1; i < 3; i++) {
+            this.createFloor(i * 200, 400, 1)
+        }
+
+        this.ball.setPosition(this.floors[0].x, this.floors[0].y - this.floors[0].height / 2 - 300)
     }
 }

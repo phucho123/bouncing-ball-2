@@ -53,9 +53,6 @@ export class GameOverScene extends Phaser.Scene {
                 targets: [this.playAgain, this.highScoreDisplay, this.scoreDisplay],
                 duration: 1000,
                 alpha: 0,
-                onComplete: () => {
-                    this.scene.start('Play Scene')
-                },
             })
 
             this.tweens.add({
@@ -63,7 +60,7 @@ export class GameOverScene extends Phaser.Scene {
                 duration: 1000,
                 scale: 2,
                 onComplete: () => {
-                    this.scene.start('Play Scene')
+                    this.scene.switch('Play Scene')
                 },
             })
         })
