@@ -11,6 +11,8 @@ export class ObjectManager {
     private extraFloors: Phaser.Physics.Matter.Image[]
     private pipes: Phaser.GameObjects.Rectangle[]
     private extraPipes: Phaser.GameObjects.Rectangle[]
+    private hitPoints: Phaser.GameObjects.Rectangle[]
+    private extraHitPoints: Phaser.GameObjects.Rectangle[]
     private ball: Phaser.Physics.Matter.Image
     private timeToSpawnPipe: number
     private cnt: number
@@ -21,6 +23,9 @@ export class ObjectManager {
     private scoreDisplay: Phaser.GameObjects.Text
     private timeToChangeColor: number
     private colorIndex: number
+    private tween: Phaser.Tweens.Tween
+    private combo: number
+    private comboDisplay: Phaser.GameObjects.Text
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -32,6 +37,8 @@ export class ObjectManager {
         this.extraGems = []
         this.spikes = []
         this.extraSpikes = []
+        this.hitPoints = []
+        this.extraHitPoints = []
         this.colors = [0x8cff66, 0x668cff, 0xff8533, 0xdf80ff, 0xff3333]
         this.floorSpeed = -2
         this.jumpSpeed = -8
@@ -40,9 +47,26 @@ export class ObjectManager {
         this.colorIndex = 0
         this.timeToSpawnPipe = 70
         this.cnt = this.timeToSpawnPipe
+        this.comboDisplay = this.scene.add
+            .text(100, 200, 'Perfect', {
+                fontSize: '32px',
+                fontFamily: 'Arial',
+                color: '#ffffff',
+                testString: '1234y',
+            })
+            .setAlpha(0)
+        this.comboDisplay.setX(200 - this.comboDisplay.displayWidth / 2)
+        this.tween = this.scene.tweens.add({
+            targets: this.comboDisplay,
+            duration: 1000,
+            alpha: 1,
+            repeat: -1,
+        })
+        this.combo = 0
     }
 
     initial() {
+        if (this.tween.isPlaying()) this.tween.pause()
         this.ball = this.scene.matter.add.image(
             Phaser.Math.Between(100, 700),
             Phaser.Math.Between(-600, 0),
@@ -66,7 +90,6 @@ export class ObjectManager {
             )
             .setOnCollide(() => {
                 this.ball.setVelocity(0, this.jumpSpeed)
-                this.timeToChangeColor--
                 PlayScene.score++
                 PlayScene.start = true
             })
@@ -83,6 +106,7 @@ export class ObjectManager {
         } else {
             newFloor = this.scene.matter.add.image(200, 100, 'floor')
             newFloor.setOnCollide(() => {
+                console.log('collided')
                 if (newFloor) {
                     newFloor.active = false
                     const gem = this.gems.filter((gem) => {
@@ -99,6 +123,14 @@ export class ObjectManager {
                     })
 
                     if (spike[0]) spike[0].setActive(false)
+
+                    this.createHitpoint(
+                        newFloor.x,
+                        newFloor.y,
+                        newFloor.displayWidth,
+                        newFloor.displayHeight,
+                        this.ball.x - newFloor.x
+                    )
                 }
             })
             console.log('create New Floor')
@@ -156,7 +188,7 @@ export class ObjectManager {
             newPipe.displayHeight = height
             newPipe.setPosition(x, y)
             newPipe.fillColor = this.colors[this.colorIndex]
-
+            this.timeToChangeColor--
             this.pipes.push(newPipe)
         }
     }
@@ -177,6 +209,40 @@ export class ObjectManager {
             newGem.setPosition(x, y - newGem.displayHeight / 2)
 
             this.gems.push(newGem)
+        }
+    }
+
+    createHitpoint(x: number, y: number, width: number, height: number, diff_x: number) {
+        let hitpoint: Phaser.GameObjects.Rectangle | undefined
+        if (this.extraHitPoints.length) {
+            hitpoint = this.extraHitPoints.shift()
+            if (hitpoint) {
+                hitpoint.setY(y)
+                hitpoint.scaleX = width / (3 * hitpoint.width)
+            }
+        } else {
+            console.log('create new hit point')
+            hitpoint = this.scene.add.rectangle(x, y, width / 3, height, 0xff0000).setDepth(3)
+        }
+        if (hitpoint != undefined) {
+            if (diff_x < -width / 6) {
+                this.combo = 0
+                hitpoint.setX(x - width / 3)
+                if (this.tween.isPlaying()) this.tween.pause()
+            } else if (diff_x > width / 6) {
+                this.combo = 0
+                hitpoint.setX(x + width / 3)
+                if (this.tween.isPlaying()) this.tween.pause()
+            } else {
+                hitpoint.setX(x)
+                this.combo++
+                if (!this.tween.isPlaying()) this.tween.play()
+            }
+
+            const pipe = this.pipes.filter((pipe) => pipe.x == x)[0]
+            if (pipe) hitpoint.fillColor = pipe.fillColor
+            hitpoint.setActive(false)
+            this.hitPoints.push(hitpoint)
         }
     }
 
@@ -242,17 +308,15 @@ export class ObjectManager {
             PlayScene.gameOver = true
         }
 
-        for (const floor of this.floors) {
-            if (floor.x + floor.displayWidth / 2 <= 0) {
+        for (let i = 0; i < this.floors.length; i++) {
+            if (
+                this.floors[i].x + this.floors[i].displayWidth / 2 <= 0 ||
+                this.floors[i].y - this.floors[i].displayHeight / 2 >= 600
+            ) {
                 const removeFloor = this.floors.shift()
                 if (removeFloor != undefined) {
                     this.extraFloors.push(removeFloor)
                 }
-            }
-        }
-
-        for (const pipe of this.pipes) {
-            if (pipe.x + pipe.displayWidth / 2 <= 0) {
                 const removePipe = this.pipes.shift()
                 if (removePipe != undefined) {
                     this.extraPipes.push(removePipe)
@@ -260,8 +324,17 @@ export class ObjectManager {
             }
         }
 
+        // for (const pipe of this.pipes) {
+        //     if (pipe.x + pipe.displayWidth / 2 <= 0 || pipe.y - pipe.displayHeight / 2 >= 600) {
+        //         const removePipe = this.pipes.shift()
+        //         if (removePipe != undefined) {
+        //             this.extraPipes.push(removePipe)
+        //         }
+        //     }
+        // }
+
         for (const gem of this.gems) {
-            if (gem.x + gem.displayWidth / 2 <= 0) {
+            if (gem.x + gem.displayWidth / 2 <= 0 || gem.y - gem.displayHeight / 2 >= 600) {
                 const removeGem = this.gems.shift()
                 if (removeGem != undefined) {
                     this.extraGems.push(removeGem)
@@ -270,16 +343,30 @@ export class ObjectManager {
         }
 
         for (const spike of this.spikes) {
-            if (spike.x + spike.displayWidth / 2 <= 0) {
+            if (spike.x + spike.displayWidth / 2 <= 0 || spike.y - spike.displayHeight / 2 >= 600) {
                 const removeSpike = this.spikes.shift()
                 if (removeSpike != undefined) {
                     this.extraSpikes.push(removeSpike)
                 }
             }
         }
+
+        for (const hitpoint of this.hitPoints) {
+            if (
+                hitpoint.x + hitpoint.displayWidth / 2 <= 0 ||
+                hitpoint.y - hitpoint.displayHeight / 2 >= 600
+            ) {
+                const removeHitpoint = this.hitPoints.shift()
+                if (removeHitpoint != undefined) {
+                    this.extraHitPoints.push(removeHitpoint)
+                }
+            }
+        }
     }
 
     moveFloor() {
+        if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
+        else this.comboDisplay.setText('Perfect')
         for (let i = 0; i < this.floors.length; i++) {
             this.floors[i].setX(this.floors[i].x + this.floorSpeed)
             this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
@@ -313,6 +400,11 @@ export class ObjectManager {
             }
             spike.setX(spike.x + this.floorSpeed)
             if (!spike.active) spike.setY(spike.y + 2)
+        }
+
+        for (const hitpoint of this.hitPoints) {
+            hitpoint.setX(hitpoint.x + this.floorSpeed)
+            if (!hitpoint.active) hitpoint.setY(hitpoint.y + 2)
         }
     }
 

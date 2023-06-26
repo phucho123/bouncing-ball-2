@@ -35,7 +35,7 @@ export class PlayScene extends Phaser.Scene {
             })
             .setStroke('black', 1)
             .setAlpha(0.5)
-        this.scoreDisplay.setX(this.scoreDisplay.x - this.scoreDisplay.width / 2)
+        this.scoreDisplay.setX(200 - this.scoreDisplay.width / 2)
         this.objectManager.initial()
     }
 
