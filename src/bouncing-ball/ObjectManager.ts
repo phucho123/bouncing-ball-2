@@ -54,12 +54,16 @@ export class ObjectManager {
         }
 
         this.ball
-            .setCircle(this.ball.width / 2)
+            .setScale(0.12)
+            .setCircle(this.ball.displayWidth / 2)
             .setFriction(0.005)
             .setBounce(1.2)
             .setMass(3)
             .setDepth(2)
-            .setPosition(this.floors[0].x, this.floors[0].y - this.floors[0].height / 2 - 300)
+            .setPosition(
+                this.floors[0].x,
+                this.floors[0].y - this.floors[0].displayHeight / 2 - 300
+            )
             .setOnCollide(() => {
                 this.ball.setVelocity(0, this.jumpSpeed)
                 this.timeToChangeColor--
@@ -118,10 +122,23 @@ export class ObjectManager {
             this.createGem(newFloor.x, newFloor.y - newFloor.displayHeight / 2)
 
             if (scaleX >= 1.1) {
-                this.createSpike(
-                    newFloor.x - newFloor.displayWidth / 2,
-                    newFloor.y - newFloor.displayHeight / 2
-                )
+                let pos: string
+                const tmp = Phaser.Math.Between(0, 1)
+                if (tmp == 0) pos = 'left'
+                else pos = 'right'
+                if (pos == 'left') {
+                    this.createSpike(
+                        newFloor.x - newFloor.displayWidth / 2,
+                        newFloor.y - newFloor.displayHeight / 2,
+                        pos
+                    )
+                } else {
+                    this.createSpike(
+                        newFloor.x + newFloor.displayWidth / 2,
+                        newFloor.y - newFloor.displayHeight / 2,
+                        pos
+                    )
+                }
             }
         }
     }
@@ -163,7 +180,9 @@ export class ObjectManager {
         }
     }
 
-    createSpike(x: number, y: number) {
+    createSpike(x: number, y: number, position: string) {
+        const tmp = Phaser.Math.Between(0, 5)
+        if (tmp != 3) return
         let newSpike
         if (this.extraSpikes.length) {
             newSpike = this.extraSpikes.shift()
@@ -175,7 +194,9 @@ export class ObjectManager {
         if (newSpike) {
             newSpike.setActive(true)
             newSpike.setAlpha(1).setDepth(0)
-            newSpike.setPosition(x + newSpike.displayWidth / 2, y - newSpike.displayHeight / 2)
+            if (position == 'left')
+                newSpike.setPosition(x + newSpike.displayWidth / 2, y - newSpike.displayHeight / 2)
+            else newSpike.setPosition(x - newSpike.displayWidth / 2, y - newSpike.displayHeight / 2)
 
             this.spikes.push(newSpike)
         }
@@ -216,7 +237,7 @@ export class ObjectManager {
     }
 
     checkOutOfBound() {
-        if (this.ball.y >= this.ball.height / 2 + 600) {
+        if (this.ball.y >= this.ball.displayHeight / 2 + 600) {
             console.log('Game Over')
             PlayScene.gameOver = true
         }
@@ -330,7 +351,10 @@ export class ObjectManager {
             this.createFloor(i * 200, 400, 1)
         }
 
-        this.ball.setPosition(this.floors[0].x, this.floors[0].y - this.floors[0].height / 2 - 300)
+        this.ball.setPosition(
+            this.floors[0].x,
+            this.floors[0].y - this.floors[0].displayHeight / 2 - 300
+        )
         this.scene.add.triangle()
     }
 

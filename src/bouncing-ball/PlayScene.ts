@@ -12,7 +12,7 @@ export class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('ball', 'assets/sprites/pangball.png')
+        this.load.image('ball', 'assets/sprites/ball.png')
         this.load.image('pipe', 'assets/images/up-pipe.png')
         this.load.image('floor', 'assets/images/floor.png')
         this.load.image('gem', 'assets/images/gem.png')
