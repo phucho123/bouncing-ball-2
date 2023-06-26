@@ -20,6 +20,7 @@ export class PlayScene extends Phaser.Scene {
     }
 
     create() {
+        console.log('create play scene')
         this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false
         PlayScene.gameOver = false

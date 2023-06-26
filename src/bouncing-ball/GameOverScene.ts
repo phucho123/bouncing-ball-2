@@ -14,16 +14,6 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     create() {
-        const tmp = localStorage.getItem('highScore')
-        if (tmp != null) {
-            this.highScore = parseInt(tmp)
-        } else this.highScore = 0
-
-        if (GameOverScene.score > this.highScore) {
-            this.highScore = Math.max(this.highScore, GameOverScene.score)
-            localStorage.setItem('highScore', this.highScore.toString())
-        }
-
         this.playAgain = this.add.image(200, 300, 'replay-button').setInteractive().setScale(0.7)
 
         this.scoreDisplay = this.add
@@ -49,20 +39,35 @@ export class GameOverScene extends Phaser.Scene {
             .setInteractive()
 
         this.playAgain.on('pointerdown', () => {
-            this.tweens.add({
-                targets: [this.playAgain, this.highScoreDisplay, this.scoreDisplay],
-                duration: 1000,
-                alpha: 0,
-            })
+            this.scene.switch('Play Scene')
+            // this.tweens.add({
+            //     targets: [this.playAgain, this.highScoreDisplay, this.scoreDisplay],
+            //     duration: 1000,
+            //     alpha: 0,
+            // })
 
-            this.tweens.add({
-                targets: [this.playAgain],
-                duration: 1000,
-                scale: 2,
-                onComplete: () => {
-                    this.scene.switch('Play Scene')
-                },
-            })
+            // this.tweens.add({
+            //     targets: [this.playAgain],
+            //     duration: 1000,
+            //     scale: 2,
+            //     onComplete: () => {
+            //         ///
+            //     },
+            // })
         })
+    }
+
+    update() {
+        const tmp = localStorage.getItem('highScore')
+        if (tmp != null) {
+            this.highScore = parseInt(tmp)
+        } else this.highScore = 0
+
+        if (GameOverScene.score > this.highScore) {
+            this.highScore = Math.max(this.highScore, GameOverScene.score)
+            localStorage.setItem('highScore', this.highScore.toString())
+        }
+        this.scoreDisplay.setText(`Score: ${GameOverScene.score}`)
+        this.highScoreDisplay.setText(`High Score: ${this.highScore}`)
     }
 }

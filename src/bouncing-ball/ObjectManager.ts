@@ -20,12 +20,11 @@ export class ObjectManager {
     private floorSpeed: number
     private fallSpeed: number
     private jumpSpeed: number
-    private scoreDisplay: Phaser.GameObjects.Text
     private timeToChangeColor: number
     private colorIndex: number
-    private tween: Phaser.Tweens.Tween
-    private combo: number
-    private comboDisplay: Phaser.GameObjects.Text
+    // private tween: Phaser.Tweens.Tween
+    // private combo: number
+    // private comboDisplay: Phaser.GameObjects.Text
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -47,26 +46,26 @@ export class ObjectManager {
         this.colorIndex = 0
         this.timeToSpawnPipe = 70
         this.cnt = this.timeToSpawnPipe
-        this.comboDisplay = this.scene.add
-            .text(100, 200, 'Perfect', {
-                fontSize: '32px',
-                fontFamily: 'Arial',
-                color: '#ffffff',
-                testString: '1234y',
-            })
-            .setAlpha(0)
-        this.comboDisplay.setX(200 - this.comboDisplay.displayWidth / 2)
-        this.tween = this.scene.tweens.add({
-            targets: this.comboDisplay,
-            duration: 1000,
-            alpha: 1,
-            repeat: -1,
-        })
-        this.combo = 0
+        // this.comboDisplay = this.scene.add
+        //     .text(100, 200, 'Perfect', {
+        //         fontSize: '32px',
+        //         fontFamily: 'Arial',
+        //         color: '#ffffff',
+        //         testString: '1234y',
+        //     })
+        //     .setAlpha(0)
+        // this.comboDisplay.setX(200 - this.comboDisplay.displayWidth / 2)
+        // this.tween = this.scene.tweens.add({
+        //     targets: this.comboDisplay,
+        //     duration: 1000,
+        //     alpha: 1,
+        //     repeat: -1,
+        // })
+        // this.combo = 0
     }
 
     initial() {
-        if (this.tween.isPlaying()) this.tween.pause()
+        // if (this.tween.isPlaying()) this.tween.pause()
         this.ball = this.scene.matter.add.image(
             Phaser.Math.Between(100, 700),
             Phaser.Math.Between(-600, 0),
@@ -106,7 +105,7 @@ export class ObjectManager {
         } else {
             newFloor = this.scene.matter.add.image(200, 100, 'floor')
             newFloor.setOnCollide(() => {
-                console.log('collided')
+                // console.log('collided')
                 if (newFloor) {
                     newFloor.active = false
                     const gem = this.gems.filter((gem) => {
@@ -226,17 +225,17 @@ export class ObjectManager {
         }
         if (hitpoint != undefined) {
             if (diff_x < -width / 6) {
-                this.combo = 0
+                // this.combo = 0
                 hitpoint.setX(x - width / 3)
-                if (this.tween.isPlaying()) this.tween.pause()
+                // if (this.tween.isPlaying()) this.tween.pause()
             } else if (diff_x > width / 6) {
-                this.combo = 0
+                // this.combo = 0
                 hitpoint.setX(x + width / 3)
-                if (this.tween.isPlaying()) this.tween.pause()
+                // if (this.tween.isPlaying()) this.tween.pause()
             } else {
                 hitpoint.setX(x)
-                this.combo++
-                if (!this.tween.isPlaying()) this.tween.play()
+                // this.combo++
+                // if (!this.tween.isPlaying()) this.tween.play()
             }
 
             const pipe = this.pipes.filter((pipe) => pipe.x == x)[0]
@@ -283,16 +282,17 @@ export class ObjectManager {
 
     handleGameOver() {
         GameOverScene.score = PlayScene.score
-        this.scene.tweens.add({
-            targets: [this.ball, ...this.pipes, ...this.floors, ...this.gems, this.scoreDisplay],
-            duration: 1000,
-            yoyo: false,
-            alpha: 0,
-            onComplete: () => {
-                this.restart()
-                this.scene.scene.start('Game Over Scene')
-            },
-        })
+        this.restart()
+        this.scene.scene.switch('Game Over Scene')
+        // this.scene.tweens.add({
+        //     targets: [this.ball, ...this.pipes, ...this.floors, ...this.gems, this.scoreDisplay],
+        //     duration: 1000,
+        //     yoyo: false,
+        //     alpha: 0,
+        //     onComplete: () => {
+        //         //
+        //     },
+        // })
     }
 
     changeColor() {
@@ -323,15 +323,6 @@ export class ObjectManager {
                 }
             }
         }
-
-        // for (const pipe of this.pipes) {
-        //     if (pipe.x + pipe.displayWidth / 2 <= 0 || pipe.y - pipe.displayHeight / 2 >= 600) {
-        //         const removePipe = this.pipes.shift()
-        //         if (removePipe != undefined) {
-        //             this.extraPipes.push(removePipe)
-        //         }
-        //     }
-        // }
 
         for (const gem of this.gems) {
             if (gem.x + gem.displayWidth / 2 <= 0 || gem.y - gem.displayHeight / 2 >= 600) {
@@ -365,8 +356,8 @@ export class ObjectManager {
     }
 
     moveFloor() {
-        if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
-        else this.comboDisplay.setText('Perfect')
+        // if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
+        // else this.comboDisplay.setText('Perfect')
         for (let i = 0; i < this.floors.length; i++) {
             this.floors[i].setX(this.floors[i].x + this.floorSpeed)
             this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
@@ -409,6 +400,7 @@ export class ObjectManager {
     }
 
     restart() {
+        this.ball.setVelocity(0, 0)
         this.timeToChangeColor = 5
         PlayScene.score = 0
         PlayScene.start = false
@@ -435,6 +427,26 @@ export class ObjectManager {
                 if (removeGem) {
                     removeGem.setX(-1000)
                     this.extraGems.push(removeGem)
+                }
+            }
+        }
+
+        if (this.spikes) {
+            while (this.spikes.length) {
+                const removeSpike = this.spikes.shift()
+                if (removeSpike) {
+                    removeSpike.setX(-1000)
+                    this.extraSpikes.push(removeSpike)
+                }
+            }
+        }
+
+        if (this.hitPoints) {
+            while (this.hitPoints.length) {
+                const removeHitPoint = this.hitPoints.shift()
+                if (removeHitPoint) {
+                    removeHitPoint.setX(-1000)
+                    this.extraHitPoints.push(removeHitPoint)
                 }
             }
         }
