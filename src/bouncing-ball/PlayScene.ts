@@ -1,6 +1,8 @@
 import { GameOverScene } from './GameOverScene'
 
 export class PlayScene extends Phaser.Scene {
+    private object: Phaser.GameObjects.Container[]
+    private extraObject: Phaser.GameObjects.Container[]
     private floors: Phaser.Physics.Matter.Image[]
     private extraFloors: Phaser.Physics.Matter.Image[]
     private pipes: Phaser.GameObjects.Rectangle[]
@@ -31,6 +33,8 @@ export class PlayScene extends Phaser.Scene {
     }
 
     create() {
+        this.object = []
+        this.extraObject = []
         this.matter.world.setBounds(0, 0, 400, 600, 32, false, false, false, false)
         this.floors = []
         this.extraFloors = []
@@ -59,7 +63,7 @@ export class PlayScene extends Phaser.Scene {
         for (let i = 1; i < 3; i++) {
             this.createFloor(i * 200, 400, 1)
         }
-
+        this.createObject(200, 300, 1)
         this.ball
             .setCircle(this.ball.width / 2)
             .setFriction(0.005)
@@ -106,6 +110,38 @@ export class PlayScene extends Phaser.Scene {
         }
     }
 
+    createObject(x: number | null, y: number, scaleX: number) {
+        let newObject: Phaser.GameObjects.Container | undefined
+        if (this.extraObject.length) {
+            newObject = this.extraObject.shift()
+        } else {
+            newObject = this.add.container(0, 0)
+            const newFloor = this.matter.add.image(0, 0, 'floor').setStatic(true)
+            newFloor.setOnCollide(() => {
+                if (newFloor) {
+                    newFloor.active = false
+                }
+            })
+            const newPipe = this.add.rectangle(
+                0,
+                newFloor.height / 2 + 300,
+                newFloor.width,
+                600,
+                0xff0000
+            )
+
+            newObject.setSize(newFloor.displayWidth, 600)
+            newObject.add([newFloor, newPipe])
+
+            newObject.setScale(scaleX, 1)
+            if (x) newObject.setPosition(x, y)
+            else {
+                newObject.setPosition(400 + newFloor.displayWidth / 2, y)
+            }
+            this.matter.add.gameObject(newObject)
+        }
+    }
+
     createFloor(x: number | null, y: number, scaleX: number) {
         let newFloor: Phaser.Physics.Matter.Image | undefined
         if (this.extraFloors.length) {
@@ -135,9 +171,9 @@ export class PlayScene extends Phaser.Scene {
                 newFloor.displayWidth,
                 600
             )
-            if (this.triagle == undefined) {
-                this.createSpike(newFloor.x, newFloor.y - 100)
-            }
+            // if (this.triagle == undefined) {
+            //     this.createSpike(newFloor.x, newFloor.y - 100)
+            // }
         }
     }
 
@@ -159,9 +195,9 @@ export class PlayScene extends Phaser.Scene {
         }
     }
 
-    createSpike(x: number, y: number) {
-        this.triagle = this.add.triangle(x, y - 5, x, y - 10, x - 5, y, x + 5, y, 0xff00ff, 1)
-    }
+    // createSpike(x: number, y: number) {
+    //     this.triagle = this.add.triangle(x, y - 5, x, y - 10, x - 5, y, x + 5, y, 0xff00ff, 1)
+    // }
 
     createEveryThing() {
         this.createFloor(null, Phaser.Math.Between(300, 500), Phaser.Math.Between(1, 3) / 2)
