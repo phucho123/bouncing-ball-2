@@ -276,7 +276,7 @@ export class ObjectManager {
             newSpike = this.extraSpikes.shift()
         } else {
             newSpike = this.scene.add.image(x, y, 'spike').setScale(0.3)
-            newSpike.scaleX = 0.2
+            // newSpike.scaleX = 0.2
             console.log('create New Spike')
         }
         if (newSpike) {
@@ -387,7 +387,7 @@ export class ObjectManager {
 
         for (const gem of this.gems) {
             if (
-                this.checkBallCollidGameObject(gem, gem.displayWidth, gem.displayHeight) &&
+                this.checkBallCollideGameObject(gem, gem.displayWidth, gem.displayHeight) &&
                 gem.alpha
             ) {
                 gem.setAlpha(0)
@@ -399,9 +399,9 @@ export class ObjectManager {
 
         for (const spike of this.spikes) {
             if (
-                this.checkBallCollidGameObject(
+                this.checkBallCollideGameObject(
                     spike,
-                    0.5 * spike.displayWidth,
+                    0.4 * spike.displayWidth,
                     spike.displayHeight * 0.8
                 )
             ) {
@@ -463,7 +463,7 @@ export class ObjectManager {
         }
     }
 
-    checkBallCollidGameObject(
+    checkBallCollideGameObject(
         gamObject: Phaser.GameObjects.Image,
         width: number,
         height: number
