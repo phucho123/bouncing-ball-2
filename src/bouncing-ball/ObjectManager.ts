@@ -1,5 +1,6 @@
 import { GameOverScene } from './GameOverScene'
 import { PlayScene } from './PlayScene'
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
 
 export class ObjectManager {
     private scene: Phaser.Scene
@@ -66,14 +67,10 @@ export class ObjectManager {
 
     initial() {
         // if (this.tween.isPlaying()) this.tween.pause()
-        this.ball = this.scene.matter.add.image(
-            Phaser.Math.Between(100, 700),
-            Phaser.Math.Between(-600, 0),
-            'ball'
-        )
+        this.ball = this.scene.matter.add.image(0, 0, 'ball')
 
         for (let i = 1; i < 3; i++) {
-            this.createFloor(i * 200, 400, 1)
+            this.createFloor((i * CANVAS_WIDTH) / 2, CANVAS_WIDTH, 1)
         }
 
         this.ball
@@ -85,9 +82,10 @@ export class ObjectManager {
             .setDepth(2)
             .setPosition(
                 this.floors[0].x,
-                this.floors[0].y - this.floors[0].displayHeight / 2 - 300
+                this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
             )
             .setOnCollide(() => {
+                this.ball.setX(CANVAS_WIDTH / 2)
                 this.ball.setVelocity(0, this.jumpSpeed)
                 PlayScene.score++
                 PlayScene.start = true
@@ -98,79 +96,69 @@ export class ObjectManager {
         })
     }
 
+    setFloorCollide(newFloor: Phaser.Physics.Matter.Image) {
+        newFloor.setOnCollide(() => {
+            if (newFloor) {
+                newFloor.setState(1)
+                const gem = this.gems.filter((gem) => {
+                    if (newFloor) return gem.x == newFloor.x
+                })
+                if (gem[0]) gem[0].setState(1)
+
+                const spike = this.spikes.filter((spike) => {
+                    if (newFloor)
+                        return (
+                            spike.x <= newFloor.x + newFloor.displayWidth / 2 &&
+                            spike.x >= newFloor.x - newFloor.displayWidth / 2
+                        )
+                })
+
+                if (spike[0]) spike[0].setState(1)
+
+                this.createHitpoint(
+                    newFloor.x,
+                    newFloor.y,
+                    newFloor.displayWidth,
+                    newFloor.displayHeight,
+                    this.ball.x - newFloor.x
+                )
+            }
+        })
+    }
+
     createFloor(x: number | null, y: number, scaleX: number) {
         let newFloor: Phaser.Physics.Matter.Image | undefined
         if (this.extraFloors.length) {
             newFloor = this.extraFloors.shift()
         } else {
-            newFloor = this.scene.matter.add.image(200, 100, 'floor')
-            newFloor.setOnCollide(() => {
-                // console.log('collided')
-                if (newFloor) {
-                    newFloor.active = false
-                    const gem = this.gems.filter((gem) => {
-                        if (newFloor) return gem.x == newFloor.x
-                    })
-                    if (gem[0]) gem[0].setActive(false)
-
-                    const spike = this.spikes.filter((spike) => {
-                        if (newFloor)
-                            return (
-                                spike.x <= newFloor.x + newFloor.displayWidth / 2 &&
-                                spike.x >= newFloor.x - newFloor.displayWidth / 2
-                            )
-                    })
-
-                    if (spike[0]) spike[0].setActive(false)
-
-                    this.createHitpoint(
-                        newFloor.x,
-                        newFloor.y,
-                        newFloor.displayWidth,
-                        newFloor.displayHeight,
-                        this.ball.x - newFloor.x
-                    )
-                }
-            })
+            newFloor = this.scene.matter.add.image(0, 0, 'floor')
+            this.setFloorCollide(newFloor)
             console.log('create New Floor')
         }
 
         if (newFloor) {
             newFloor.setStatic(true).setY(y)
-            if (x == null) newFloor.setX(400 + newFloor.displayWidth / 2)
+            if (x == null) newFloor.setX(CANVAS_WIDTH + newFloor.displayWidth / 2)
             else newFloor.setX(x)
             newFloor.scaleX = scaleX
-            newFloor.active = true
+            newFloor.state = 0
             this.floors.push(newFloor)
 
             this.createPipe(
                 newFloor.x,
-                newFloor.y + newFloor.displayHeight / 2 + 300,
+                newFloor.y + newFloor.displayHeight / 2 + CANVAS_HEIGHT / 2,
                 newFloor.displayWidth,
-                600
+                CANVAS_HEIGHT
             )
 
             this.createGem(newFloor.x, newFloor.y - newFloor.displayHeight / 2)
 
-            if (scaleX >= 1.1) {
-                let pos: string
-                const tmp = Phaser.Math.Between(0, 1)
-                if (tmp == 0) pos = 'left'
-                else pos = 'right'
-                if (pos == 'left') {
-                    this.createSpike(
-                        newFloor.x - newFloor.displayWidth / 2,
-                        newFloor.y - newFloor.displayHeight / 2,
-                        pos
-                    )
-                } else {
-                    this.createSpike(
-                        newFloor.x + newFloor.displayWidth / 2,
-                        newFloor.y - newFloor.displayHeight / 2,
-                        pos
-                    )
-                }
-            }
+            this.createSpike(
+                newFloor.x,
+                newFloor.y - newFloor.displayHeight / 2,
+                newFloor.displayWidth,
+                newFloor.scaleX
+            )
         }
     }
 
@@ -203,7 +191,7 @@ export class ObjectManager {
             console.log('create New Gem')
         }
         if (newGem) {
-            newGem.setActive(true)
+            newGem.setState(0)
             newGem.setAlpha(1)
             newGem.setPosition(x, y - newGem.displayHeight / 2)
 
@@ -240,14 +228,16 @@ export class ObjectManager {
 
             const pipe = this.pipes.filter((pipe) => pipe.x == x)[0]
             if (pipe) hitpoint.fillColor = pipe.fillColor
-            hitpoint.setActive(false)
+            hitpoint.setState(1)
             this.hitPoints.push(hitpoint)
         }
     }
 
-    createSpike(x: number, y: number, position: string) {
+    createSpike(x: number, y: number, width: number, scaleX: number) {
+        if (scaleX < 1.1) return
         const tmp = Phaser.Math.Between(0, 5)
         if (tmp != 3) return
+        const dir = Phaser.Math.Between(0, 1)
         let newSpike
         if (this.extraSpikes.length) {
             newSpike = this.extraSpikes.shift()
@@ -257,11 +247,18 @@ export class ObjectManager {
             console.log('create New Spike')
         }
         if (newSpike) {
-            newSpike.setActive(true)
+            newSpike.setState(0)
             newSpike.setAlpha(1).setDepth(0)
-            if (position == 'left')
-                newSpike.setPosition(x + newSpike.displayWidth / 2, y - newSpike.displayHeight / 2)
-            else newSpike.setPosition(x - newSpike.displayWidth / 2, y - newSpike.displayHeight / 2)
+            if (dir == 0)
+                newSpike.setPosition(
+                    x - width / 2 + newSpike.displayWidth / 2,
+                    y - newSpike.displayHeight / 2
+                )
+            else
+                newSpike.setPosition(
+                    x + width / 2 - newSpike.displayWidth / 2,
+                    y - newSpike.displayHeight / 2
+                )
 
             this.spikes.push(newSpike)
         }
@@ -274,7 +271,7 @@ export class ObjectManager {
             this.cnt = this.timeToSpawnPipe
             this.createFloor(
                 null,
-                Phaser.Math.Between(350, 500),
+                Phaser.Math.Between(CANVAS_HEIGHT * 0.5, CANVAS_HEIGHT * 0.8),
                 Phaser.Math.FloatBetween(1, 2.5) / 2
             )
         }
@@ -302,57 +299,39 @@ export class ObjectManager {
         }
     }
 
+    checkOutOfBoundOfArray(
+        arr: (
+            | Phaser.GameObjects.Rectangle
+            | Phaser.Physics.Matter.Image
+            | Phaser.GameObjects.Image
+        )[],
+        extraArr: (
+            | Phaser.GameObjects.Rectangle
+            | Phaser.Physics.Matter.Image
+            | Phaser.GameObjects.Image
+        )[]
+    ) {
+        for (const item of arr) {
+            if (item.x + item.displayWidth / 2 <= 0) {
+                const removeItem = arr.shift()
+                if (removeItem != undefined) {
+                    extraArr.push(removeItem)
+                }
+            }
+        }
+    }
+
     checkOutOfBound() {
-        if (this.ball.y >= this.ball.displayHeight / 2 + 600) {
+        if (this.ball.y >= this.ball.displayHeight / 2 + CANVAS_HEIGHT || this.ball.x <= 0) {
             console.log('Game Over')
             PlayScene.gameOver = true
         }
 
-        for (let i = 0; i < this.floors.length; i++) {
-            if (
-                this.floors[i].x + this.floors[i].displayWidth / 2 <= 0 ||
-                this.floors[i].y - this.floors[i].displayHeight / 2 >= 600
-            ) {
-                const removeFloor = this.floors.shift()
-                if (removeFloor != undefined) {
-                    this.extraFloors.push(removeFloor)
-                }
-                const removePipe = this.pipes.shift()
-                if (removePipe != undefined) {
-                    this.extraPipes.push(removePipe)
-                }
-            }
-        }
-
-        for (const gem of this.gems) {
-            if (gem.x + gem.displayWidth / 2 <= 0 || gem.y - gem.displayHeight / 2 >= 600) {
-                const removeGem = this.gems.shift()
-                if (removeGem != undefined) {
-                    this.extraGems.push(removeGem)
-                }
-            }
-        }
-
-        for (const spike of this.spikes) {
-            if (spike.x + spike.displayWidth / 2 <= 0 || spike.y - spike.displayHeight / 2 >= 600) {
-                const removeSpike = this.spikes.shift()
-                if (removeSpike != undefined) {
-                    this.extraSpikes.push(removeSpike)
-                }
-            }
-        }
-
-        for (const hitpoint of this.hitPoints) {
-            if (
-                hitpoint.x + hitpoint.displayWidth / 2 <= 0 ||
-                hitpoint.y - hitpoint.displayHeight / 2 >= 600
-            ) {
-                const removeHitpoint = this.hitPoints.shift()
-                if (removeHitpoint != undefined) {
-                    this.extraHitPoints.push(removeHitpoint)
-                }
-            }
-        }
+        this.checkOutOfBoundOfArray(this.floors, this.extraFloors)
+        this.checkOutOfBoundOfArray(this.gems, this.extraGems)
+        this.checkOutOfBoundOfArray(this.pipes, this.extraPipes)
+        this.checkOutOfBoundOfArray(this.spikes, this.extraSpikes)
+        this.checkOutOfBoundOfArray(this.hitPoints, this.extraHitPoints)
     }
 
     moveFloor() {
@@ -361,7 +340,7 @@ export class ObjectManager {
         for (let i = 0; i < this.floors.length; i++) {
             this.floors[i].setX(this.floors[i].x + this.floorSpeed)
             this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
-            if (!this.floors[i].active) {
+            if (this.floors[i].state) {
                 this.floors[i].setY(this.floors[i].y + 2)
                 this.pipes[i].setY(this.pipes[i].y + 2)
             }
@@ -376,7 +355,7 @@ export class ObjectManager {
                 PlayScene.score += 5
             }
             gem.setX(gem.x + this.floorSpeed)
-            if (!gem.active) gem.setY(gem.y + 2)
+            if (gem.state) gem.setY(gem.y + 2)
         }
 
         for (const spike of this.spikes) {
@@ -390,12 +369,12 @@ export class ObjectManager {
                 PlayScene.gameOver = true
             }
             spike.setX(spike.x + this.floorSpeed)
-            if (!spike.active) spike.setY(spike.y + 2)
+            if (spike.state) spike.setY(spike.y + 2)
         }
 
         for (const hitpoint of this.hitPoints) {
             hitpoint.setX(hitpoint.x + this.floorSpeed)
-            if (!hitpoint.active) hitpoint.setY(hitpoint.y + 2)
+            if (hitpoint.state) hitpoint.setY(hitpoint.y + 2)
         }
     }
 
@@ -407,59 +386,41 @@ export class ObjectManager {
         PlayScene.gameOver = false
         this.cnt = this.timeToSpawnPipe
 
-        if (this.floors) {
-            while (this.floors.length) {
-                const removeFloor = this.floors.shift()
-                if (removeFloor) {
-                    removeFloor.setX(-1000)
-                    this.extraFloors.push(removeFloor)
-                }
-                const removePipe = this.pipes.shift()
-                if (removePipe) {
-                    removePipe.setX(-1000)
-                    this.extraPipes.push(removePipe)
-                }
-            }
-        }
-        if (this.gems) {
-            while (this.gems.length) {
-                const removeGem = this.gems.shift()
-                if (removeGem) {
-                    removeGem.setX(-1000)
-                    this.extraGems.push(removeGem)
-                }
-            }
-        }
-
-        if (this.spikes) {
-            while (this.spikes.length) {
-                const removeSpike = this.spikes.shift()
-                if (removeSpike) {
-                    removeSpike.setX(-1000)
-                    this.extraSpikes.push(removeSpike)
-                }
-            }
-        }
-
-        if (this.hitPoints) {
-            while (this.hitPoints.length) {
-                const removeHitPoint = this.hitPoints.shift()
-                if (removeHitPoint) {
-                    removeHitPoint.setX(-1000)
-                    this.extraHitPoints.push(removeHitPoint)
-                }
-            }
-        }
+        this.clearArr(this.floors, this.extraFloors)
+        this.clearArr(this.pipes, this.extraPipes)
+        this.clearArr(this.gems, this.extraGems)
+        this.clearArr(this.hitPoints, this.extraHitPoints)
+        this.clearArr(this.spikes, this.extraSpikes)
 
         for (let i = 1; i < 3; i++) {
-            this.createFloor(i * 200, 400, 1)
+            this.createFloor((i * CANVAS_WIDTH) / 2, CANVAS_WIDTH, 1)
         }
 
         this.ball.setPosition(
             this.floors[0].x,
-            this.floors[0].y - this.floors[0].displayHeight / 2 - 300
+            this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
         )
-        this.scene.add.triangle()
+    }
+
+    clearArr(
+        arr: (
+            | Phaser.GameObjects.Rectangle
+            | Phaser.Physics.Matter.Image
+            | Phaser.GameObjects.Image
+        )[],
+        extraArr: (
+            | Phaser.GameObjects.Rectangle
+            | Phaser.Physics.Matter.Image
+            | Phaser.GameObjects.Image
+        )[]
+    ) {
+        while (arr.length) {
+            const removeItem = arr.shift()
+            if (removeItem) {
+                removeItem.setX(-1000)
+                extraArr.push(removeItem)
+            }
+        }
     }
 
     checkBallCollidGameObject(
