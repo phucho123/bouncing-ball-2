@@ -1,3 +1,5 @@
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
+
 export class GameOverScene extends Phaser.Scene {
     private playAgain: Phaser.GameObjects.Image
     static score: number
@@ -14,29 +16,36 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     create() {
-        this.playAgain = this.add.image(200, 300, 'replay-button').setInteractive().setScale(0.7)
+        this.playAgain = this.add
+            .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 'replay-button')
+            .setInteractive()
+            .setScale(0.7)
 
         this.scoreDisplay = this.add
             .text(100, 100, `Score: ${GameOverScene.score}`, {
                 fontSize: '32px',
                 fontFamily: 'Arial',
-                color: '#ffffff',
+                color: '#000000',
                 testString: '1234y',
                 align: 'center',
             })
             .setStroke('black', 1)
             .setInteractive()
+            .setOrigin(0.5)
+            .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
 
         this.highScoreDisplay = this.add
             .text(100, 200, `High Score: ${this.highScore}`, {
                 fontSize: '32px',
                 fontFamily: 'Arial',
-                color: '#ffffff',
+                color: '#000000',
                 testString: '1234y',
                 align: 'center',
             })
             .setStroke('black', 1)
             .setInteractive()
+            .setOrigin(0.5)
+            .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.7)
 
         this.playAgain.on('pointerdown', () => {
             this.scene.switch('Play Scene')
@@ -54,6 +63,12 @@ export class GameOverScene extends Phaser.Scene {
             //         ///
             //     },
             // })
+        })
+        this.playAgain.on('pointerover', () => {
+            this.playAgain.setAlpha(0.5)
+        })
+        this.playAgain.on('pointerout', () => {
+            this.playAgain.setAlpha(1)
         })
     }
 

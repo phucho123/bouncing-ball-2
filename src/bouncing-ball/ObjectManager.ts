@@ -23,6 +23,9 @@ export class ObjectManager {
     private jumpSpeed: number
     private timeToChangeColor: number
     private colorIndex: number
+    private floorDownSpeed: number
+    private emitter: Phaser.GameObjects.Particles.ParticleEmitter
+    private perfect: boolean
     // private tween: Phaser.Tweens.Tween
     // private combo: number
     // private comboDisplay: Phaser.GameObjects.Text
@@ -39,14 +42,15 @@ export class ObjectManager {
         this.extraSpikes = []
         this.hitPoints = []
         this.extraHitPoints = []
-        this.colors = [0x8cff66, 0x668cff, 0xff8533, 0xdf80ff, 0xff3333]
-        this.floorSpeed = -2
+        this.colors = [0xf07878, 0x9ad2f5, 0xf5d095, 0xacfabd]
+        this.floorSpeed = -2.5
         this.jumpSpeed = -8
         this.fallSpeed = 8
         this.timeToChangeColor = 5
         this.colorIndex = 0
-        this.timeToSpawnPipe = 70
+        this.timeToSpawnPipe = 50
         this.cnt = this.timeToSpawnPipe
+        this.floorDownSpeed = 2
         // this.comboDisplay = this.scene.add
         //     .text(100, 200, 'Perfect', {
         //         fontSize: '32px',
@@ -67,11 +71,23 @@ export class ObjectManager {
 
     initial() {
         // if (this.tween.isPlaying()) this.tween.pause()
-        this.ball = this.scene.matter.add.image(0, 0, 'ball')
+
+        this.ball = this.scene.matter.add.image(0, 0, 'basket-ball')
 
         for (let i = 1; i < 3; i++) {
             this.createFloor((i * CANVAS_WIDTH) / 2, CANVAS_WIDTH, 1)
         }
+
+        this.perfect = false
+        this.emitter = this.scene.add
+            .particles(100, 150, 'spark', {
+                lifespan: 2000,
+                speed: { min: 100, max: 200 },
+                scale: { start: 0.8, end: 0 },
+                gravityX: -500,
+                emitting: false,
+            })
+            .setScale(0.2)
 
         this.ball
             .setScale(0.12)
@@ -79,16 +95,29 @@ export class ObjectManager {
             .setFriction(0.005)
             .setBounce(1.2)
             .setMass(3)
-            .setDepth(2)
+            .setDepth(5)
             .setPosition(
                 this.floors[0].x,
                 this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
             )
             .setOnCollide(() => {
-                this.ball.setX(CANVAS_WIDTH / 2)
                 this.ball.setVelocity(0, this.jumpSpeed)
                 PlayScene.score++
+                this.timeToChangeColor--
                 PlayScene.start = true
+                this.emitter.setPosition(this.ball.x, this.ball.y + this.ball.displayWidth / 2)
+                if (!this.emitter.visible) this.emitter.setVisible(true)
+                if (this.perfect) {
+                    this.emitter.gravityX = 0
+                    this.emitter.gravityY = -500
+                    this.emitter.speed = 300
+                    this.emitter.explode(10)
+                } else {
+                    this.emitter.gravityX = -500
+                    this.emitter.gravityY = 0
+                    this.emitter.speed = 150
+                    this.emitter.explode(3)
+                }
             })
 
         this.scene.input.on('pointerdown', () => {
@@ -96,7 +125,7 @@ export class ObjectManager {
         })
     }
 
-    setFloorCollide(newFloor: Phaser.Physics.Matter.Image) {
+    setFloorCollideEvent(newFloor: Phaser.Physics.Matter.Image) {
         newFloor.setOnCollide(() => {
             if (newFloor) {
                 newFloor.setState(1)
@@ -132,16 +161,17 @@ export class ObjectManager {
             newFloor = this.extraFloors.shift()
         } else {
             newFloor = this.scene.matter.add.image(0, 0, 'floor')
-            this.setFloorCollide(newFloor)
+            this.setFloorCollideEvent(newFloor)
             console.log('create New Floor')
         }
 
         if (newFloor) {
-            newFloor.setStatic(true).setY(y)
+            newFloor.setStatic(true).setY(y).setOrigin
             if (x == null) newFloor.setX(CANVAS_WIDTH + newFloor.displayWidth / 2)
             else newFloor.setX(x)
             newFloor.scaleX = scaleX
             newFloor.state = 0
+            newFloor.setDepth(2)
             this.floors.push(newFloor)
 
             this.createPipe(
@@ -175,7 +205,6 @@ export class ObjectManager {
             newPipe.displayHeight = height
             newPipe.setPosition(x, y)
             newPipe.fillColor = this.colors[this.colorIndex]
-            this.timeToChangeColor--
             this.pipes.push(newPipe)
         }
     }
@@ -215,19 +244,23 @@ export class ObjectManager {
             if (diff_x < -width / 6) {
                 // this.combo = 0
                 hitpoint.setX(x - width / 3)
+                this.perfect = false
                 // if (this.tween.isPlaying()) this.tween.pause()
             } else if (diff_x > width / 6) {
                 // this.combo = 0
                 hitpoint.setX(x + width / 3)
+                this.perfect = false
                 // if (this.tween.isPlaying()) this.tween.pause()
             } else {
                 hitpoint.setX(x)
+                this.perfect = true
                 // this.combo++
                 // if (!this.tween.isPlaying()) this.tween.play()
             }
 
-            const pipe = this.pipes.filter((pipe) => pipe.x == x)[0]
-            if (pipe) hitpoint.fillColor = pipe.fillColor
+            // const pipe = this.pipes.filter((pipe) => pipe.x == x)[0]
+            // if (pipe) hitpoint.fillColor = pipe.fillColor
+            hitpoint.fillColor = this.colors[this.colorIndex]
             hitpoint.setState(1)
             this.hitPoints.push(hitpoint)
         }
@@ -271,7 +304,7 @@ export class ObjectManager {
             this.cnt = this.timeToSpawnPipe
             this.createFloor(
                 null,
-                Phaser.Math.Between(CANVAS_HEIGHT * 0.5, CANVAS_HEIGHT * 0.8),
+                Phaser.Math.Between(CANVAS_HEIGHT * 0.5, CANVAS_HEIGHT * 0.6),
                 Phaser.Math.FloatBetween(1, 2.5) / 2
             )
         }
@@ -296,6 +329,9 @@ export class ObjectManager {
         if (this.timeToChangeColor <= 0) {
             this.colorIndex = (this.colorIndex + 1) % this.colors.length
             this.timeToChangeColor = 5
+            for (const pipe of this.pipes) {
+                pipe.fillColor = this.colors[this.colorIndex]
+            }
         }
     }
 
@@ -337,12 +373,15 @@ export class ObjectManager {
     moveFloor() {
         // if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
         // else this.comboDisplay.setText('Perfect')
+        this.emitter.setX(this.emitter.x + this.floorSpeed)
+        this.emitter.setY(this.emitter.y + this.floorDownSpeed)
+        if (this.ball.x != 0) this.ball.setX(CANVAS_WIDTH / 2)
         for (let i = 0; i < this.floors.length; i++) {
             this.floors[i].setX(this.floors[i].x + this.floorSpeed)
             this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
             if (this.floors[i].state) {
-                this.floors[i].setY(this.floors[i].y + 2)
-                this.pipes[i].setY(this.pipes[i].y + 2)
+                this.floors[i].setY(this.floors[i].y + this.floorDownSpeed)
+                this.pipes[i].setY(this.pipes[i].y + this.floorDownSpeed)
             }
         }
 
@@ -355,7 +394,7 @@ export class ObjectManager {
                 PlayScene.score += 5
             }
             gem.setX(gem.x + this.floorSpeed)
-            if (gem.state) gem.setY(gem.y + 2)
+            if (gem.state) gem.setY(gem.y + this.floorDownSpeed)
         }
 
         for (const spike of this.spikes) {
@@ -369,16 +408,17 @@ export class ObjectManager {
                 PlayScene.gameOver = true
             }
             spike.setX(spike.x + this.floorSpeed)
-            if (spike.state) spike.setY(spike.y + 2)
+            if (spike.state) spike.setY(spike.y + this.floorDownSpeed)
         }
 
         for (const hitpoint of this.hitPoints) {
             hitpoint.setX(hitpoint.x + this.floorSpeed)
-            if (hitpoint.state) hitpoint.setY(hitpoint.y + 2)
+            if (hitpoint.state) hitpoint.setY(hitpoint.y + this.floorDownSpeed)
         }
     }
 
     restart() {
+        this.emitter.setVisible(false)
         this.ball.setVelocity(0, 0)
         this.timeToChangeColor = 5
         PlayScene.score = 0

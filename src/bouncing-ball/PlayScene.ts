@@ -1,4 +1,5 @@
 import { ObjectManager } from './ObjectManager'
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
 
 export class PlayScene extends Phaser.Scene {
     public static start: boolean
@@ -12,11 +13,13 @@ export class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('ball', 'assets/sprites/ball.png')
+        this.load.image('normal-ball', 'assets/sprites/ball.png')
+        this.load.image('basket-ball', 'assets/images/ball.png')
         this.load.image('pipe', 'assets/images/up-pipe.png')
         this.load.image('floor', 'assets/images/floor.png')
         this.load.image('gem', 'assets/images/gem.png')
         this.load.image('spike', 'assets/images/triangle.png')
+        this.load.image('spark', 'assets/images/spark.png')
     }
 
     create() {
@@ -28,22 +31,41 @@ export class PlayScene extends Phaser.Scene {
         this.objectManager = new ObjectManager(this)
 
         this.scoreDisplay = this.add
-            .text(200, 100, `${PlayScene.score}`, {
-                fontSize: '100px',
+            .text(0, 0, `${PlayScene.score}`, {
+                fontSize: '180px',
                 fontFamily: 'Arial',
-                color: '#ffffff',
-                testString: '12342',
+                color: '#cccccc',
+                testString: '123y2',
             })
-            .setStroke('black', 1)
             .setAlpha(0.5)
-        this.scoreDisplay.setX(200 - this.scoreDisplay.width / 2)
+            .setOrigin(0.5)
+        this.scoreDisplay.setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
         this.objectManager.initial()
+        // this.add
+        //     .rectangle(0, CANVAS_HEIGHT * 0.95)
+        //     .setOrigin(0)
+        //     .setFillStyle(0xebf9fa, 0.3)
+        //     .setSize(CANVAS_WIDTH, CANVAS_HEIGHT * 0.1)
+        //     .setDepth(5)
+        // .setStrokeStyle(0, 0xebf9fa)
     }
 
-    update() {
+    // update(time) {
+    //     if (PlayScene.gameOver) this.objectManager.handleGameOver()
+    //     this.objectManager.changeColor()
+    //     this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
+
+    //     this.objectManager.checkOutOfBound()
+    //     if (PlayScene.start) {
+    //         this.objectManager.createObject()
+    //         this.objectManager.moveFloor()
+    //     }
+    // }
+    update(): void {
         if (PlayScene.gameOver) this.objectManager.handleGameOver()
         this.objectManager.changeColor()
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
+
         this.objectManager.checkOutOfBound()
         if (PlayScene.start) {
             this.objectManager.createObject()
