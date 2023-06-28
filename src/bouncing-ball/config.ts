@@ -10,7 +10,7 @@ export const config = {
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
     backgroundColor: '#ebf9fa',
-    parent: 'phaser-example',
+    parent: 'game',
     physics: {
         default: 'matter',
         matter: {

@@ -16,9 +16,10 @@ export class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('normal-ball', 'assets/sprites/ball.png')
-        this.load.image('basket-ball', 'assets/images/ball.png')
-        this.load.image('poke-ball', 'assets/images/poke-ball.png')
+        this.load.image('normalball', 'assets/sprites/ball.png')
+        this.load.image('basketball', 'assets/images/ball.png')
+        this.load.image('pokeball', 'assets/images/poke-ball.png')
+        this.load.image('football', 'assets/images/football.png')
         this.load.image('pipe', 'assets/images/up-pipe.png')
         this.load.image('floor', 'assets/images/floor.png')
         this.load.image('gem', 'assets/images/gem.png')
@@ -36,7 +37,7 @@ export class PlayScene extends Phaser.Scene {
         PlayScene.gameOver = false
         PlayScene.score = 0
         this.objectManager = new ObjectManager(this)
-        this.balls = ['normal-ball', 'basket-ball', 'poke-ball']
+        this.balls = ['normalball', 'basketball', 'pokeball', 'football']
         this.currentBall = 0
 
         this.scoreDisplay = this.add

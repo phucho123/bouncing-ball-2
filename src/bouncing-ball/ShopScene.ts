@@ -1,20 +1,22 @@
-import { CANVAS_WIDTH } from './constant'
+import { BALL_SIZE, CANVAS_WIDTH } from './constant'
 
 export class ShopScene extends Phaser.Scene {
     private balls: Phaser.GameObjects.Image[]
     static chosenBall: number
+    private ballKey: string[]
     constructor() {
         super({ key: 'Shop Scene' })
     }
     preload() {
-        this.load.image('normal-ball', 'assets/sprites/ball.png')
-        this.load.image('basket-ball', 'assets/images/ball.png')
-        this.load.image('poke-ball', 'assets/images/poke-ball.png')
+        this.load.image('normalball', 'assets/sprites/ball.png')
+        this.load.image('basketball', 'assets/images/ball.png')
+        this.load.image('pokeball', 'assets/images/poke-ball.png')
+        this.load.image('football', 'assets/images/football.png')
         this.load.image('back', 'assets/images/back.png')
     }
     create() {
-        ShopScene.chosenBall = 0
         this.balls = []
+        this.ballKey = ['normalball', 'basketball', 'pokeball', 'football']
         this.add
             .image(10, 10, 'back')
             .setOrigin(0)
@@ -32,14 +34,7 @@ export class ShopScene extends Phaser.Scene {
             })
             .setStroke('black', 1)
             .setOrigin(0.5, 0)
-        this.createBall('normal-ball', 10, 100, 0)
-        this.createBall('basket-ball', 120, 100, 1)
-        this.createBall('poke-ball', 230, 100, 2)
-        // this.back.
-        // this.balls = []
-        // const ball_1 = this.add.image(0, 0, 'normal-ball').setOrigin(0).setScale(0.2)
-        // const ball_2 = this.add.image(100, 0, 'basket-ball').setOrigin(0)
-        // ball_2.setScale((ball_1.width / ball_2.width) * 0.2)
+        this.createBallList()
     }
     createBall(key: string, x: number, y: number, number: number) {
         const ball = this.add.image(x, y, key).setOrigin(0)
@@ -47,9 +42,26 @@ export class ShopScene extends Phaser.Scene {
             .setInteractive()
             .on('pointerdown', () => {
                 ShopScene.chosenBall = number
+                localStorage.setItem('chosenBall', number.toString())
                 for (const ball of this.balls) ball.setAlpha(1)
-                ball.setAlpha(0.5)
+                ball.setAlpha(0.3)
             })
+        if (ShopScene.chosenBall == number) ball.setAlpha(0.3)
         this.balls.push(ball)
+    }
+    createBallList() {
+        const align =
+            (CANVAS_WIDTH - Math.floor(CANVAS_WIDTH / (BALL_SIZE * 2)) * (BALL_SIZE * 2)) / 2
+        const numBallInRow = Math.floor(CANVAS_WIDTH / (BALL_SIZE * 2))
+        for (let i = 0; i < this.ballKey.length; i++) {
+            const c = i % numBallInRow,
+                r = Math.floor(i / numBallInRow)
+            this.createBall(
+                this.ballKey[i],
+                align + c * (BALL_SIZE * 2),
+                r * BALL_SIZE * 2 + 100,
+                i
+            )
+        }
     }
 }

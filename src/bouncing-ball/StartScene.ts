@@ -1,3 +1,4 @@
+import { ShopScene } from './ShopScene'
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
 
 export class StartScene extends Phaser.Scene {
@@ -83,5 +84,12 @@ export class StartScene extends Phaser.Scene {
             .setStroke('black', 1)
             .setOrigin(0.5)
             .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
+
+        const chosenBall = localStorage.getItem('chosenBall')
+        if (chosenBall) {
+            ShopScene.chosenBall = parseInt(chosenBall)
+        } else {
+            ShopScene.chosenBall = 0
+        }
     }
 }

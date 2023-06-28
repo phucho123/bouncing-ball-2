@@ -66,7 +66,7 @@ export class ObjectManager {
     initial() {
         // if (this.tween.isPlaying()) this.tween.pause()
 
-        this.ball = this.scene.matter.add.image(0, 0, 'normal-ball')
+        this.ball = this.scene.matter.add.image(0, 0, 'normalball')
 
         for (let i = 2; i <= 4; i++) {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
