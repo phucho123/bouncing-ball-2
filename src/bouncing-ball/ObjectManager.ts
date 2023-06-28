@@ -1,6 +1,6 @@
 import { GameOverScene } from './GameOverScene'
 import { PlayScene } from './PlayScene'
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class ObjectManager {
     private scene: Phaser.Scene
@@ -26,6 +26,7 @@ export class ObjectManager {
     private floorDownSpeed: number
     private emitter: Phaser.GameObjects.Particles.ParticleEmitter
     private perfect: boolean
+    private delta: number
     // private tween: Phaser.Tweens.Tween
     // private combo: number
     // private comboDisplay: Phaser.GameObjects.Text
@@ -48,9 +49,10 @@ export class ObjectManager {
         this.fallSpeed = 8
         this.timeToChangeColor = 5
         this.colorIndex = 0
-        this.timeToSpawnPipe = 50
+        this.timeToSpawnPipe = 40
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
+        this.delta = DELTA_TIME
         // this.comboDisplay = this.scene.add
         //     .text(100, 200, 'Perfect', {
         //         fontSize: '32px',
@@ -72,10 +74,10 @@ export class ObjectManager {
     initial() {
         // if (this.tween.isPlaying()) this.tween.pause()
 
-        this.ball = this.scene.matter.add.image(0, 0, 'basket-ball')
+        this.ball = this.scene.matter.add.image(0, 0, 'normal-ball')
 
-        for (let i = 1; i < 3; i++) {
-            this.createFloor((i * CANVAS_WIDTH) / 2, CANVAS_WIDTH, 1)
+        for (let i = 2; i <= 4; i++) {
+            this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
 
         this.perfect = false
@@ -93,15 +95,15 @@ export class ObjectManager {
             .setScale(0.12)
             .setCircle(this.ball.displayWidth / 2)
             .setFriction(0.005)
-            .setBounce(1.2)
+            .setBounce(0)
             .setMass(3)
             .setDepth(5)
             .setPosition(
-                this.floors[0].x,
+                CANVAS_WIDTH / 2,
                 this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
             )
             .setOnCollide(() => {
-                this.ball.setVelocity(0, this.jumpSpeed)
+                this.ball.setVelocity(0, Math.max((this.jumpSpeed * this.delta) / DELTA_TIME, -10))
                 PlayScene.score++
                 this.timeToChangeColor--
                 PlayScene.start = true
@@ -109,19 +111,20 @@ export class ObjectManager {
                 if (!this.emitter.visible) this.emitter.setVisible(true)
                 if (this.perfect) {
                     this.emitter.gravityX = 0
-                    this.emitter.gravityY = -500
-                    this.emitter.speed = 300
+                    this.emitter.gravityY = (-500 * this.delta) / DELTA_TIME
+                    this.emitter.speed = (300 * this.delta) / DELTA_TIME
                     this.emitter.explode(10)
                 } else {
-                    this.emitter.gravityX = -500
+                    this.emitter.gravityX = (-500 * this.delta) / DELTA_TIME
                     this.emitter.gravityY = 0
-                    this.emitter.speed = 150
+                    this.emitter.speed = (150 * this.delta) / DELTA_TIME
                     this.emitter.explode(3)
                 }
             })
 
         this.scene.input.on('pointerdown', () => {
-            if (!PlayScene.gameOver) this.ball.setVelocity(0, this.fallSpeed)
+            if (!PlayScene.gameOver)
+                this.ball.setVelocity(0, (this.fallSpeed * this.delta) / DELTA_TIME)
         })
     }
 
@@ -157,10 +160,11 @@ export class ObjectManager {
 
     createFloor(x: number | null, y: number, scaleX: number) {
         let newFloor: Phaser.Physics.Matter.Image | undefined
+
         if (this.extraFloors.length) {
             newFloor = this.extraFloors.shift()
         } else {
-            newFloor = this.scene.matter.add.image(0, 0, 'floor')
+            newFloor = this.scene.matter.add.image(0, 0, 'floor').setBounce(0)
             this.setFloorCollideEvent(newFloor)
             console.log('create New Floor')
         }
@@ -243,17 +247,30 @@ export class ObjectManager {
         if (hitpoint != undefined) {
             if (diff_x < -width / 6) {
                 // this.combo = 0
+                // if (this.tween.isPlaying()) this.tween.pause()
                 hitpoint.setX(x - width / 3)
                 this.perfect = false
-                // if (this.tween.isPlaying()) this.tween.pause()
+                const spike = this.spikes.filter(
+                    (spike) => spike.x < x && spike.x > x - width / 2
+                )[0]
+                if (spike) PlayScene.gameOver = true
             } else if (diff_x > width / 6) {
                 // this.combo = 0
+                // if (this.tween.isPlaying()) this.tween.pause()
                 hitpoint.setX(x + width / 3)
                 this.perfect = false
-                // if (this.tween.isPlaying()) this.tween.pause()
+                const spike = this.spikes.filter(
+                    (spike) => spike.x > x && spike.x < x + width / 2
+                )[0]
+                if (spike) PlayScene.gameOver = true
             } else {
                 hitpoint.setX(x)
                 this.perfect = true
+                const gem = this.gems.filter((gem) => gem.x == x)[0]
+                if (gem && gem.alpha) {
+                    gem.setAlpha(0)
+                    PlayScene.score += 5
+                }
                 // this.combo++
                 // if (!this.tween.isPlaying()) this.tween.play()
             }
@@ -276,7 +293,6 @@ export class ObjectManager {
             newSpike = this.extraSpikes.shift()
         } else {
             newSpike = this.scene.add.image(x, y, 'spike').setScale(0.3)
-            // newSpike.scaleX = 0.2
             console.log('create New Spike')
         }
         if (newSpike) {
@@ -292,14 +308,14 @@ export class ObjectManager {
                     x + width / 2 - newSpike.displayWidth / 2,
                     y - newSpike.displayHeight / 2
                 )
-
             this.spikes.push(newSpike)
         }
     }
 
-    createObject() {
-        this.ball.rotation += Phaser.Math.DEG_TO_RAD * 3
-        this.cnt--
+    createObject(delta: number) {
+        this.delta = delta
+        this.ball.rotation += (Phaser.Math.DEG_TO_RAD * 3 * delta) / DELTA_TIME
+        this.cnt -= Math.round((1 * delta) / DELTA_TIME)
         if (this.cnt <= 0) {
             this.cnt = this.timeToSpawnPipe
             this.createFloor(
@@ -353,7 +369,7 @@ export class ObjectManager {
                 if (removeItem != undefined) {
                     extraArr.push(removeItem)
                 }
-            }
+            } else break
         }
     }
 
@@ -370,50 +386,38 @@ export class ObjectManager {
         this.checkOutOfBoundOfArray(this.hitPoints, this.extraHitPoints)
     }
 
-    moveFloor() {
+    moveFloor(delta: number) {
         // if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
         // else this.comboDisplay.setText('Perfect')
-        this.emitter.setX(this.emitter.x + this.floorSpeed)
-        this.emitter.setY(this.emitter.y + this.floorDownSpeed)
+        this.ball.setMass((3 * delta) / DELTA_TIME)
+        // this.ball.setBounce((1.2 * DELTA_TIME) / delta)
+        this.emitter.setX(this.emitter.x + (this.floorSpeed * delta) / DELTA_TIME)
+        this.emitter.setY(this.emitter.y + (this.floorDownSpeed * delta) / DELTA_TIME)
+
         if (this.ball.x != 0) this.ball.setX(CANVAS_WIDTH / 2)
         for (let i = 0; i < this.floors.length; i++) {
-            this.floors[i].setX(this.floors[i].x + this.floorSpeed)
-            this.pipes[i].setX(this.pipes[i].x + this.floorSpeed)
+            this.floors[i].setX(this.floors[i].x + (this.floorSpeed * delta) / DELTA_TIME)
+            this.pipes[i].setX(this.pipes[i].x + (this.floorSpeed * delta) / DELTA_TIME)
             if (this.floors[i].state) {
-                this.floors[i].setY(this.floors[i].y + this.floorDownSpeed)
-                this.pipes[i].setY(this.pipes[i].y + this.floorDownSpeed)
+                this.floors[i].setY(this.floors[i].y + (this.floorDownSpeed * delta) / DELTA_TIME)
+                this.pipes[i].setY(this.pipes[i].y + (this.floorDownSpeed * delta) / DELTA_TIME)
             }
         }
 
         for (const gem of this.gems) {
-            if (
-                this.checkBallCollideGameObject(gem, gem.displayWidth, gem.displayHeight) &&
-                gem.alpha
-            ) {
-                gem.setAlpha(0)
-                PlayScene.score += 5
-            }
-            gem.setX(gem.x + this.floorSpeed)
-            if (gem.state) gem.setY(gem.y + this.floorDownSpeed)
+            gem.setX(gem.x + (this.floorSpeed * delta) / DELTA_TIME)
+            if (gem.state) gem.setY(gem.y + (this.floorDownSpeed * delta) / DELTA_TIME)
         }
 
         for (const spike of this.spikes) {
-            if (
-                this.checkBallCollideGameObject(
-                    spike,
-                    0.4 * spike.displayWidth,
-                    spike.displayHeight * 0.8
-                )
-            ) {
-                PlayScene.gameOver = true
-            }
-            spike.setX(spike.x + this.floorSpeed)
-            if (spike.state) spike.setY(spike.y + this.floorDownSpeed)
+            spike.setX(spike.x + (this.floorSpeed * delta) / DELTA_TIME)
+            if (spike.state) spike.setY(spike.y + (this.floorDownSpeed * delta) / DELTA_TIME)
         }
 
         for (const hitpoint of this.hitPoints) {
-            hitpoint.setX(hitpoint.x + this.floorSpeed)
-            if (hitpoint.state) hitpoint.setY(hitpoint.y + this.floorDownSpeed)
+            hitpoint.setX(hitpoint.x + (this.floorSpeed * delta) / DELTA_TIME)
+            if (hitpoint.state)
+                hitpoint.setY(hitpoint.y + (this.floorDownSpeed * delta) / DELTA_TIME)
         }
     }
 
@@ -432,12 +436,12 @@ export class ObjectManager {
         this.clearArr(this.hitPoints, this.extraHitPoints)
         this.clearArr(this.spikes, this.extraSpikes)
 
-        for (let i = 1; i < 3; i++) {
-            this.createFloor((i * CANVAS_WIDTH) / 2, CANVAS_WIDTH, 1)
+        for (let i = 2; i <= 4; i++) {
+            this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
 
         this.ball.setPosition(
-            this.floors[0].x,
+            CANVAS_WIDTH / 2,
             this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
         )
     }
@@ -461,21 +465,5 @@ export class ObjectManager {
                 extraArr.push(removeItem)
             }
         }
-    }
-
-    checkBallCollideGameObject(
-        gamObject: Phaser.GameObjects.Image,
-        width: number,
-        height: number
-    ): boolean {
-        const diff_x = Math.abs(gamObject.x - this.ball.x)
-        const diff_y = Math.abs(gamObject.y - this.ball.y)
-
-        if (
-            diff_x <= width / 2 + this.ball.displayWidth / 2 &&
-            diff_y <= height / 2 + this.ball.displayHeight / 2
-        )
-            return true
-        return false
     }
 }

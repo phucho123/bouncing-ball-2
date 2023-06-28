@@ -1,2 +1,3 @@
-export const CANVAS_WIDTH = 400
-export const CANVAS_HEIGHT = 600
+export const CANVAS_WIDTH = Math.min(400, window.innerWidth)
+export const CANVAS_HEIGHT = Math.min(600, window.innerHeight)
+export const DELTA_TIME = 7

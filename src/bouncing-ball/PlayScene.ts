@@ -1,5 +1,5 @@
 import { ObjectManager } from './ObjectManager'
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class PlayScene extends Phaser.Scene {
     public static start: boolean
@@ -61,15 +61,32 @@ export class PlayScene extends Phaser.Scene {
     //         this.objectManager.moveFloor()
     //     }
     // }
-    update(): void {
+    // update(): void {
+    //     if (PlayScene.gameOver) this.objectManager.handleGameOver()
+    //     this.objectManager.changeColor()
+    //     this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
+
+    //     this.objectManager.checkOutOfBound()
+    //     if (PlayScene.start) {
+    //         this.objectManager.createObject()
+    //         this.objectManager.moveFloor()
+    //     }
+    // }
+    update(time: number, delta: number): void {
+        this.matter.world.setGravity(0, (0.5 * delta) / DELTA_TIME)
+        // console.log(delta)
         if (PlayScene.gameOver) this.objectManager.handleGameOver()
         this.objectManager.changeColor()
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
+        // if (this.scoreDisplay.displayWidth > CANVAS_WIDTH) {
+        //     console.log(this.scoreDisplay.displayWidth)
+        //     this.scoreDisplay.setScale(0.4)
+        // }
 
         this.objectManager.checkOutOfBound()
         if (PlayScene.start) {
-            this.objectManager.createObject()
-            this.objectManager.moveFloor()
+            this.objectManager.createObject(delta)
+            this.objectManager.moveFloor(delta)
         }
     }
 }

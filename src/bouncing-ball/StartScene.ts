@@ -54,7 +54,7 @@ export class StartScene extends Phaser.Scene {
         })
         this.text = this.add
             .text(60, 100, 'Bouncing\n   Ball 2', {
-                fontSize: '64px',
+                fontSize: `${(64 * CANVAS_WIDTH) / 400}px`,
                 fontFamily: 'Arial',
                 color: '#000000',
                 testString: '1234y',
