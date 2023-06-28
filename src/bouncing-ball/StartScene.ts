@@ -27,12 +27,6 @@ export class StartScene extends Phaser.Scene {
             .setScale(0.2)
             .setOrigin(0.5, 0)
             .setInteractive()
-        // this.shopButton.on('pointerover', () => {
-        //     this.shopButton.setAlpha(0.5)
-        // })
-        // this.shopButton.on('pointerout', () => {
-        //     this.shopButton.setAlpha(1)
-        // })
 
         startButton.on('pointerdown', () => {
             this.tweens.add({
