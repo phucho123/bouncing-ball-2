@@ -1,4 +1,5 @@
 import { ObjectManager } from './ObjectManager'
+import { ShopScene } from './ShopScene'
 import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class PlayScene extends Phaser.Scene {
@@ -7,6 +8,8 @@ export class PlayScene extends Phaser.Scene {
     public static score: number
     private scoreDisplay: Phaser.GameObjects.Text
     private objectManager: ObjectManager
+    private balls: string[]
+    private currentBall: number
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -15,6 +18,7 @@ export class PlayScene extends Phaser.Scene {
     preload() {
         this.load.image('normal-ball', 'assets/sprites/ball.png')
         this.load.image('basket-ball', 'assets/images/ball.png')
+        this.load.image('poke-ball', 'assets/images/poke-ball.png')
         this.load.image('pipe', 'assets/images/up-pipe.png')
         this.load.image('floor', 'assets/images/floor.png')
         this.load.image('gem', 'assets/images/gem.png')
@@ -32,6 +36,8 @@ export class PlayScene extends Phaser.Scene {
         PlayScene.gameOver = false
         PlayScene.score = 0
         this.objectManager = new ObjectManager(this)
+        this.balls = ['normal-ball', 'basket-ball', 'poke-ball']
+        this.currentBall = 0
 
         this.scoreDisplay = this.add
             .text(0, 0, `${PlayScene.score}`, {
@@ -44,47 +50,17 @@ export class PlayScene extends Phaser.Scene {
             .setOrigin(0.5)
         this.scoreDisplay.setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
         this.objectManager.initial()
-        // this.add
-        //     .rectangle(0, CANVAS_HEIGHT * 0.95)
-        //     .setOrigin(0)
-        //     .setFillStyle(0xebf9fa, 0.3)
-        //     .setSize(CANVAS_WIDTH, CANVAS_HEIGHT * 0.1)
-        //     .setDepth(5)
-        // .setStrokeStyle(0, 0xebf9fa)
     }
-
-    // update(time) {
-    //     if (PlayScene.gameOver) this.objectManager.handleGameOver()
-    //     this.objectManager.changeColor()
-    //     this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
-
-    //     this.objectManager.checkOutOfBound()
-    //     if (PlayScene.start) {
-    //         this.objectManager.createObject()
-    //         this.objectManager.moveFloor()
-    //     }
-    // }
-    // update(): void {
-    //     if (PlayScene.gameOver) this.objectManager.handleGameOver()
-    //     this.objectManager.changeColor()
-    //     this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
-
-    //     this.objectManager.checkOutOfBound()
-    //     if (PlayScene.start) {
-    //         this.objectManager.createObject()
-    //         this.objectManager.moveFloor()
-    //     }
-    // }
     update(time: number, delta: number): void {
         this.matter.world.setGravity(0, (0.5 * delta) / DELTA_TIME)
+        if (this.currentBall != ShopScene.chosenBall) {
+            this.currentBall = ShopScene.chosenBall
+            this.objectManager.changeBall(this.balls[this.currentBall])
+        }
         // console.log(delta)
         if (PlayScene.gameOver) this.objectManager.handleGameOver()
         this.objectManager.changeColor()
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
-        // if (this.scoreDisplay.displayWidth > CANVAS_WIDTH) {
-        //     console.log(this.scoreDisplay.displayWidth)
-        //     this.scoreDisplay.setScale(0.4)
-        // }
 
         this.objectManager.checkOutOfBound()
         if (PlayScene.start) {

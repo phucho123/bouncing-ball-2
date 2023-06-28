@@ -2,7 +2,6 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
 
 export class StartScene extends Phaser.Scene {
     private text: Phaser.GameObjects.Text
-    private startButton: Phaser.GameObjects.Image
 
     constructor() {
         super({ key: 'Start Scene' })
@@ -10,17 +9,33 @@ export class StartScene extends Phaser.Scene {
 
     preload() {
         this.load.image('start-button', 'assets/images/start-button.png')
+        this.load.image('shop-button', 'assets/images/shop.png')
     }
 
     create() {
-        this.startButton = this.add
+        const startButton = this.add
             .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 'start-button')
             .setScale(0.2)
             .setInteractive()
+        const shopButton = this.add
+            .image(
+                CANVAS_WIDTH / 2,
+                startButton.y + startButton.displayHeight / 2 + 50,
+                'shop-button'
+            )
+            .setScale(0.2)
+            .setOrigin(0.5, 0)
+            .setInteractive()
+        // this.shopButton.on('pointerover', () => {
+        //     this.shopButton.setAlpha(0.5)
+        // })
+        // this.shopButton.on('pointerout', () => {
+        //     this.shopButton.setAlpha(1)
+        // })
 
-        this.startButton.on('pointerdown', () => {
+        startButton.on('pointerdown', () => {
             this.tweens.add({
-                targets: this.startButton,
+                targets: startButton,
                 scale: 0.1,
                 duration: 500,
                 yoyo: true,
@@ -32,12 +47,19 @@ export class StartScene extends Phaser.Scene {
                         yoyo: false,
                         alpha: 0,
                         onComplete: () => {
+                            this.tweens.add({
+                                targets: [this.text],
+                                y: (CANVAS_HEIGHT / 2) * 0.5,
+                                duration: 1000,
+                                yoyo: false,
+                                alpha: 1,
+                            })
                             this.scene.switch('Play Scene')
                         },
                     })
 
                     this.tweens.add({
-                        targets: this.startButton,
+                        targets: [startButton, shopButton],
                         y: 800,
                         duration: 1000,
                         alpha: 0,
@@ -46,12 +68,11 @@ export class StartScene extends Phaser.Scene {
                 },
             })
         })
-        this.startButton.on('pointerover', () => {
-            this.startButton.setAlpha(0.5)
+
+        shopButton.on('pointerdown', () => {
+            this.scene.switch('Shop Scene')
         })
-        this.startButton.on('pointerout', () => {
-            this.startButton.setAlpha(1)
-        })
+
         this.text = this.add
             .text(60, 100, 'Bouncing\n   Ball 2', {
                 fontSize: `${(64 * CANVAS_WIDTH) / 400}px`,

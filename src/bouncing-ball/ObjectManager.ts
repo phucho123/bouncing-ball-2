@@ -1,6 +1,6 @@
 import { GameOverScene } from './GameOverScene'
 import { PlayScene } from './PlayScene'
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
+import { BALL_SIZE, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class ObjectManager {
     private scene: Phaser.Scene
@@ -22,6 +22,7 @@ export class ObjectManager {
     private emitter: Phaser.GameObjects.Particles.ParticleEmitter
     private perfect: boolean
     private delta: number
+
     // private tween: Phaser.Tweens.Tween
     // private combo: number
     // private comboDisplay: Phaser.GameObjects.Text
@@ -43,6 +44,7 @@ export class ObjectManager {
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
+
         // this.comboDisplay = this.scene.add
         //     .text(100, 200, 'Perfect', {
         //         fontSize: '16px',
@@ -77,14 +79,14 @@ export class ObjectManager {
             .particles(100, 150, 'red', {
                 lifespan: 2000,
                 speed: { min: 100, max: 200 },
-                scale: { start: 0.8, end: 0 },
+                scale: { start: 0.6, end: 0 },
                 gravityX: -500,
                 emitting: false,
             })
             .setScale(0.2)
 
         this.ball
-            .setScale(0.12)
+            .setScale(BALL_SIZE / this.ball.width)
             .setCircle(this.ball.displayWidth / 2)
             .setFriction(0.005)
             .setBounce(0)
@@ -405,6 +407,7 @@ export class ObjectManager {
 
     update(delta: number) {
         this.delta = delta
+
         this.createObject()
         this.moveFloor()
     }
@@ -476,5 +479,10 @@ export class ObjectManager {
         for (const item of arr) {
             item.setX(-1000)
         }
+    }
+
+    changeBall(ball: string) {
+        this.ball.setTexture(ball)
+        this.ball.setScale(BALL_SIZE / this.ball.width)
     }
 }
