@@ -91,5 +91,15 @@ export class StartScene extends Phaser.Scene {
         } else {
             ShopScene.chosenBall = 0
         }
+        const playerGem = localStorage.getItem('totalGem')
+        if (playerGem) {
+            ShopScene.playerGem = parseInt(playerGem)
+        } else {
+            ShopScene.playerGem = 0
+        }
+        const boughtBall = localStorage.getItem('boughtBall')
+        if (!boughtBall) {
+            localStorage.setItem('boughtBall', '0')
+        }
     }
 }

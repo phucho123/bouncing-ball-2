@@ -1,5 +1,6 @@
 import { GameOverScene } from './GameOverScene'
 import { PlayScene } from './PlayScene'
+import { ShopScene } from './ShopScene'
 import { BALL_SIZE, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class ObjectManager {
@@ -22,10 +23,8 @@ export class ObjectManager {
     private emitter: Phaser.GameObjects.Particles.ParticleEmitter
     private perfect: boolean
     private delta: number
-
-    // private tween: Phaser.Tweens.Tween
-    // private combo: number
-    // private comboDisplay: Phaser.GameObjects.Text
+    private combo: number
+    private comboDisplay: Phaser.GameObjects.Text
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -45,34 +44,24 @@ export class ObjectManager {
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
 
-        // this.comboDisplay = this.scene.add
-        //     .text(100, 200, 'Perfect', {
-        //         fontSize: '16px',
-        //         fontFamily: 'Arial',
-        //         color: '#ffffff',
-        //         testString: '1234y',
-        //     })
-        //     .setAlpha(0)
-        // this.comboDisplay.setX(200 - this.comboDisplay.displayWidth / 2)
-        // this.tween = this.scene.tweens.add({
-        //     targets: this.comboDisplay,
-        //     duration: 1000,
-        //     alpha: 1,
-        //     repeat: -1,
-        // })
-        // this.combo = 0
+        this.comboDisplay = this.scene.add
+            .text(100, 200, 'Perfect', {
+                fontSize: '20px',
+                fontFamily: 'Arial',
+                color: '#437a5b',
+                testString: '1234y',
+            })
+            .setAlpha(0)
+            .setOrigin(0.5)
+        this.combo = 0
     }
 
     initial() {
-        // if (this.tween.isPlaying()) this.tween.pause()
-
         this.ball = this.scene.matter.add.image(0, 0, 'normalball')
 
         for (let i = 2; i <= 4; i++) {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
-
-        console.log(this.floors.length)
 
         this.perfect = false
         this.emitter = this.scene.add
@@ -258,18 +247,16 @@ export class ObjectManager {
         }
         if (hitpoint != undefined) {
             if (diff_x < -width / 6) {
-                // this.combo = 0
-                // if (this.tween.isPlaying()) this.tween.pause()
                 hitpoint.setX(x - width / 3)
                 this.perfect = false
+                this.combo = 0
                 const spike = this.spikes.filter(
                     (spike) => spike.x < x && spike.x > x - width / 2
                 )[0]
                 if (spike) PlayScene.gameOver = true
             } else if (diff_x > width / 6) {
-                // this.combo = 0
-                // if (this.tween.isPlaying()) this.tween.pause()
                 hitpoint.setX(x + width / 3)
+                this.combo = 0
                 this.perfect = false
                 const spike = this.spikes.filter(
                     (spike) => spike.x > x && spike.x < x + width / 2
@@ -277,14 +264,14 @@ export class ObjectManager {
                 if (spike) PlayScene.gameOver = true
             } else {
                 hitpoint.setX(x)
+                this.combo++
                 this.perfect = true
                 const gem = this.gems.filter((gem) => gem.x == x)[0]
                 if (gem && gem.alpha) {
                     gem.setAlpha(0)
                     PlayScene.score += 5
+                    ShopScene.playerGem++
                 }
-                // this.combo++
-                // if (!this.tween.isPlaying()) this.tween.play()
             }
             hitpoint.fillColor = this.colors[this.colorIndex]
             hitpoint.setState(1)
@@ -339,15 +326,6 @@ export class ObjectManager {
         GameOverScene.score = PlayScene.score
         this.restart()
         this.scene.scene.switch('Game Over Scene')
-        // this.scene.tweens.add({
-        //     targets: [this.ball, ...this.pipes, ...this.floors, ...this.gems, this.scoreDisplay],
-        //     duration: 1000,
-        //     yoyo: false,
-        //     alpha: 0,
-        //     onComplete: () => {
-        //         //
-        //     },
-        // })
     }
 
     changeColor() {
@@ -407,16 +385,29 @@ export class ObjectManager {
 
     update(delta: number) {
         this.delta = delta
-
+        if (this.perfect) {
+            if (this.combo >= 2) this.comboDisplay.setText(`Perfect X ${this.combo}`)
+            else {
+                this.comboDisplay.setText('Perfect')
+            }
+            this.comboDisplay
+                .setPosition(
+                    this.ball.x,
+                    this.ball.y -
+                        this.ball.displayWidth / 2 -
+                        this.comboDisplay.displayHeight / 2 -
+                        30
+                )
+                .setAlpha(1)
+        } else {
+            this.comboDisplay.setAlpha(0)
+        }
         this.createObject()
         this.moveFloor()
     }
 
     moveFloor() {
-        // if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
-        // else this.comboDisplay.setText('Perfect')
         this.ball.setMass((3 * this.delta) / DELTA_TIME)
-        // this.ball.setBounce((1.2 * DELTA_TIME) / delta)
         this.emitter.setX(this.emitter.x + (this.floorSpeed * this.delta) / DELTA_TIME)
         this.emitter.setY(this.emitter.y + (this.floorDownSpeed * this.delta) / DELTA_TIME)
 
@@ -452,6 +443,7 @@ export class ObjectManager {
         PlayScene.start = false
         PlayScene.gameOver = false
         this.cnt = this.timeToSpawnPipe
+        this.comboDisplay.setAlpha(0)
 
         this.clearArr(this.floors)
         this.clearArr(this.pipes)

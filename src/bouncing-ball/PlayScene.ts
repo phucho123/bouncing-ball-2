@@ -49,6 +49,7 @@ export class PlayScene extends Phaser.Scene {
             })
             .setAlpha(0.5)
             .setOrigin(0.5)
+            .setDepth(0)
         this.scoreDisplay.setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
         this.objectManager.initial()
     }
@@ -58,7 +59,7 @@ export class PlayScene extends Phaser.Scene {
             this.currentBall = ShopScene.chosenBall
             this.objectManager.changeBall(this.balls[this.currentBall])
         }
-        // console.log(delta)
+
         if (PlayScene.gameOver) this.objectManager.handleGameOver()
         this.objectManager.changeColor()
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
