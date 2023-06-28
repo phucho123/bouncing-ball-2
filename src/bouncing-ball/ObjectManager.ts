@@ -5,15 +5,10 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 export class ObjectManager {
     private scene: Phaser.Scene
     private gems: Phaser.GameObjects.Image[]
-    private extraGems: Phaser.GameObjects.Image[]
     private spikes: Phaser.GameObjects.Image[]
-    private extraSpikes: Phaser.GameObjects.Image[]
     private floors: Phaser.Physics.Matter.Image[]
-    private extraFloors: Phaser.Physics.Matter.Image[]
     private pipes: Phaser.GameObjects.Rectangle[]
-    private extraPipes: Phaser.GameObjects.Rectangle[]
     private hitPoints: Phaser.GameObjects.Rectangle[]
-    private extraHitPoints: Phaser.GameObjects.Rectangle[]
     private ball: Phaser.Physics.Matter.Image
     private timeToSpawnPipe: number
     private cnt: number
@@ -34,15 +29,10 @@ export class ObjectManager {
     constructor(scene: Phaser.Scene) {
         this.scene = scene
         this.floors = []
-        this.extraFloors = []
         this.pipes = []
-        this.extraPipes = []
         this.gems = []
-        this.extraGems = []
         this.spikes = []
-        this.extraSpikes = []
         this.hitPoints = []
-        this.extraHitPoints = []
         this.colors = [0xf07878, 0x9ad2f5, 0xf5d095, 0xacfabd]
         this.floorSpeed = -2.5
         this.jumpSpeed = -8
@@ -55,7 +45,7 @@ export class ObjectManager {
         this.delta = DELTA_TIME
         // this.comboDisplay = this.scene.add
         //     .text(100, 200, 'Perfect', {
-        //         fontSize: '32px',
+        //         fontSize: '16px',
         //         fontFamily: 'Arial',
         //         color: '#ffffff',
         //         testString: '1234y',
@@ -79,6 +69,8 @@ export class ObjectManager {
         for (let i = 2; i <= 4; i++) {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
+
+        console.log(this.floors.length)
 
         this.perfect = false
         this.emitter = this.scene.add
@@ -132,6 +124,12 @@ export class ObjectManager {
         newFloor.setOnCollide(() => {
             if (newFloor) {
                 newFloor.setState(1)
+                const pipe = this.pipes.filter((pipe) => {
+                    return pipe.x == newFloor.x
+                })
+                if (pipe[0]) {
+                    pipe[0].setState(1)
+                }
                 const gem = this.gems.filter((gem) => {
                     if (newFloor) return gem.x == newFloor.x
                 })
@@ -161,12 +159,14 @@ export class ObjectManager {
     createFloor(x: number | null, y: number, scaleX: number) {
         let newFloor: Phaser.Physics.Matter.Image | undefined
 
-        if (this.extraFloors.length) {
-            newFloor = this.extraFloors.shift()
-        } else {
+        const newFloorFilter = this.floors.filter((floor) => floor.x + floor.displayWidth / 2 <= 0)
+        if (newFloorFilter.length == 0) {
             newFloor = this.scene.matter.add.image(0, 0, 'floor').setBounce(0)
             this.setFloorCollideEvent(newFloor)
             console.log('create New Floor')
+            this.floors.push(newFloor)
+        } else {
+            newFloor = newFloorFilter[0]
         }
 
         if (newFloor) {
@@ -174,9 +174,8 @@ export class ObjectManager {
             if (x == null) newFloor.setX(CANVAS_WIDTH + newFloor.displayWidth / 2)
             else newFloor.setX(x)
             newFloor.scaleX = scaleX
-            newFloor.state = 0
+            newFloor.setState(0)
             newFloor.setDepth(2)
-            this.floors.push(newFloor)
 
             this.createPipe(
                 newFloor.x,
@@ -198,18 +197,21 @@ export class ObjectManager {
 
     createPipe(x: number, y: number, width: number, height: number) {
         let newPipe
-        if (this.extraPipes.length) {
-            newPipe = this.extraPipes.shift()
-        } else {
+
+        const newPipeFilter = this.pipes.filter((pipe) => pipe.x + pipe.displayWidth / 2 <= 0)
+        if (newPipeFilter.length == 0) {
             newPipe = this.scene.add.rectangle(x, y, width, height, 0xff0000)
             console.log('create New Pipe')
+            this.pipes.push(newPipe)
+        } else {
+            newPipe = newPipeFilter[0]
         }
         if (newPipe) {
             newPipe.displayWidth = width
             newPipe.displayHeight = height
             newPipe.setPosition(x, y)
+            newPipe.setState(0)
             newPipe.fillColor = this.colors[this.colorIndex]
-            this.pipes.push(newPipe)
         }
     }
 
@@ -217,32 +219,40 @@ export class ObjectManager {
         const prob = Phaser.Math.Between(0, 100) % 5
         if (prob != 0) return
         let newGem
-        if (this.extraGems.length) {
-            newGem = this.extraGems.shift()
-        } else {
+
+        const newGemFilter = this.gems.filter(
+            (gem) => gem.x + gem.displayWidth / 2 <= 0 || gem.alpha == 0
+        )
+        if (newGemFilter.length == 0) {
             newGem = this.scene.add.image(x, y, 'gem').setScale(0.3)
+            this.gems.push(newGem)
             console.log('create New Gem')
+        } else {
+            newGem = newGemFilter[0]
         }
+
         if (newGem) {
             newGem.setState(0)
             newGem.setAlpha(1)
             newGem.setPosition(x, y - newGem.displayHeight / 2)
-
-            this.gems.push(newGem)
         }
     }
 
     createHitpoint(x: number, y: number, width: number, height: number, diff_x: number) {
         let hitpoint: Phaser.GameObjects.Rectangle | undefined
-        if (this.extraHitPoints.length) {
-            hitpoint = this.extraHitPoints.shift()
+        const newHitpointFilter = this.hitPoints.filter(
+            (hitpoint) => hitpoint.x + hitpoint.displayWidth / 2 <= 0
+        )
+        if (newHitpointFilter.length == 0) {
+            hitpoint = this.scene.add.rectangle(x, y, width / 3, height, 0xff0000).setDepth(3)
+            this.hitPoints.push(hitpoint)
+            console.log('create New Spike')
+        } else {
+            hitpoint = newHitpointFilter[0]
             if (hitpoint) {
                 hitpoint.setY(y)
                 hitpoint.scaleX = width / (3 * hitpoint.width)
             }
-        } else {
-            console.log('create new hit point')
-            hitpoint = this.scene.add.rectangle(x, y, width / 3, height, 0xff0000).setDepth(3)
         }
         if (hitpoint != undefined) {
             if (diff_x < -width / 6) {
@@ -274,12 +284,8 @@ export class ObjectManager {
                 // this.combo++
                 // if (!this.tween.isPlaying()) this.tween.play()
             }
-
-            // const pipe = this.pipes.filter((pipe) => pipe.x == x)[0]
-            // if (pipe) hitpoint.fillColor = pipe.fillColor
             hitpoint.fillColor = this.colors[this.colorIndex]
             hitpoint.setState(1)
-            this.hitPoints.push(hitpoint)
         }
     }
 
@@ -289,12 +295,15 @@ export class ObjectManager {
         if (tmp != 3) return
         const dir = Phaser.Math.Between(0, 1)
         let newSpike
-        if (this.extraSpikes.length) {
-            newSpike = this.extraSpikes.shift()
-        } else {
+        const newSpikeFilter = this.spikes.filter((spike) => spike.x + spike.displayWidth / 2 <= 0)
+        if (newSpikeFilter.length == 0) {
             newSpike = this.scene.add.image(x, y, 'spike').setScale(0.3)
+            this.spikes.push(newSpike)
             console.log('create New Spike')
+        } else {
+            newSpike = newSpikeFilter[0]
         }
+
         if (newSpike) {
             newSpike.setState(0)
             newSpike.setAlpha(1).setDepth(0)
@@ -308,14 +317,12 @@ export class ObjectManager {
                     x + width / 2 - newSpike.displayWidth / 2,
                     y - newSpike.displayHeight / 2
                 )
-            this.spikes.push(newSpike)
         }
     }
 
-    createObject(delta: number) {
-        this.delta = delta
-        this.ball.rotation += (Phaser.Math.DEG_TO_RAD * 3 * delta) / DELTA_TIME
-        this.cnt -= Math.round((1 * delta) / DELTA_TIME)
+    createObject() {
+        this.ball.rotation += (Phaser.Math.DEG_TO_RAD * 3 * this.delta) / DELTA_TIME
+        this.cnt -= Math.round((1 * this.delta) / DELTA_TIME)
         if (this.cnt <= 0) {
             this.cnt = this.timeToSpawnPipe
             this.createFloor(
@@ -378,46 +385,43 @@ export class ObjectManager {
             console.log('Game Over')
             PlayScene.gameOver = true
         }
-
-        this.checkOutOfBoundOfArray(this.floors, this.extraFloors)
-        this.checkOutOfBoundOfArray(this.gems, this.extraGems)
-        this.checkOutOfBoundOfArray(this.pipes, this.extraPipes)
-        this.checkOutOfBoundOfArray(this.spikes, this.extraSpikes)
-        this.checkOutOfBoundOfArray(this.hitPoints, this.extraHitPoints)
     }
 
-    moveFloor(delta: number) {
+    update(delta: number) {
+        this.delta = delta
+        this.createObject()
+        this.moveFloor()
+    }
+
+    moveFloor() {
         // if (this.combo >= 2) this.comboDisplay.setText(`Perfect X${this.combo}`)
         // else this.comboDisplay.setText('Perfect')
-        this.ball.setMass((3 * delta) / DELTA_TIME)
+        this.ball.setMass((3 * this.delta) / DELTA_TIME)
         // this.ball.setBounce((1.2 * DELTA_TIME) / delta)
-        this.emitter.setX(this.emitter.x + (this.floorSpeed * delta) / DELTA_TIME)
-        this.emitter.setY(this.emitter.y + (this.floorDownSpeed * delta) / DELTA_TIME)
+        this.emitter.setX(this.emitter.x + (this.floorSpeed * this.delta) / DELTA_TIME)
+        this.emitter.setY(this.emitter.y + (this.floorDownSpeed * this.delta) / DELTA_TIME)
 
         if (this.ball.x != 0) this.ball.setX(CANVAS_WIDTH / 2)
-        for (let i = 0; i < this.floors.length; i++) {
-            this.floors[i].setX(this.floors[i].x + (this.floorSpeed * delta) / DELTA_TIME)
-            this.pipes[i].setX(this.pipes[i].x + (this.floorSpeed * delta) / DELTA_TIME)
-            if (this.floors[i].state) {
-                this.floors[i].setY(this.floors[i].y + (this.floorDownSpeed * delta) / DELTA_TIME)
-                this.pipes[i].setY(this.pipes[i].y + (this.floorDownSpeed * delta) / DELTA_TIME)
+
+        this.moveGameObject(this.floors)
+        this.moveGameObject(this.pipes)
+        this.moveGameObject(this.spikes)
+        this.moveGameObject(this.gems)
+        this.moveGameObject(this.hitPoints)
+    }
+
+    moveGameObject(
+        arr: (
+            | Phaser.GameObjects.Rectangle
+            | Phaser.Physics.Matter.Image
+            | Phaser.GameObjects.Image
+        )[]
+    ) {
+        for (const item of arr) {
+            item.setX(item.x + (this.floorSpeed * this.delta) / DELTA_TIME)
+            if (item.state) {
+                item.setY(item.y + (this.floorDownSpeed * this.delta) / DELTA_TIME)
             }
-        }
-
-        for (const gem of this.gems) {
-            gem.setX(gem.x + (this.floorSpeed * delta) / DELTA_TIME)
-            if (gem.state) gem.setY(gem.y + (this.floorDownSpeed * delta) / DELTA_TIME)
-        }
-
-        for (const spike of this.spikes) {
-            spike.setX(spike.x + (this.floorSpeed * delta) / DELTA_TIME)
-            if (spike.state) spike.setY(spike.y + (this.floorDownSpeed * delta) / DELTA_TIME)
-        }
-
-        for (const hitpoint of this.hitPoints) {
-            hitpoint.setX(hitpoint.x + (this.floorSpeed * delta) / DELTA_TIME)
-            if (hitpoint.state)
-                hitpoint.setY(hitpoint.y + (this.floorDownSpeed * delta) / DELTA_TIME)
         }
     }
 
@@ -430,11 +434,11 @@ export class ObjectManager {
         PlayScene.gameOver = false
         this.cnt = this.timeToSpawnPipe
 
-        this.clearArr(this.floors, this.extraFloors)
-        this.clearArr(this.pipes, this.extraPipes)
-        this.clearArr(this.gems, this.extraGems)
-        this.clearArr(this.hitPoints, this.extraHitPoints)
-        this.clearArr(this.spikes, this.extraSpikes)
+        this.clearArr(this.floors)
+        this.clearArr(this.pipes)
+        this.clearArr(this.spikes)
+        this.clearArr(this.hitPoints)
+        this.clearArr(this.gems)
 
         for (let i = 2; i <= 4; i++) {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
@@ -451,19 +455,10 @@ export class ObjectManager {
             | Phaser.GameObjects.Rectangle
             | Phaser.Physics.Matter.Image
             | Phaser.GameObjects.Image
-        )[],
-        extraArr: (
-            | Phaser.GameObjects.Rectangle
-            | Phaser.Physics.Matter.Image
-            | Phaser.GameObjects.Image
         )[]
     ) {
-        while (arr.length) {
-            const removeItem = arr.shift()
-            if (removeItem) {
-                removeItem.setX(-1000)
-                extraArr.push(removeItem)
-            }
+        for (const item of arr) {
+            item.setX(-1000)
         }
     }
 }

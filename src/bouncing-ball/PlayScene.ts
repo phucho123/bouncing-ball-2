@@ -85,8 +85,7 @@ export class PlayScene extends Phaser.Scene {
 
         this.objectManager.checkOutOfBound()
         if (PlayScene.start) {
-            this.objectManager.createObject(delta)
-            this.objectManager.moveFloor(delta)
+            this.objectManager.update(delta)
         }
     }
 }
