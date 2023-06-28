@@ -19,7 +19,10 @@ export class PlayScene extends Phaser.Scene {
         this.load.image('floor', 'assets/images/floor.png')
         this.load.image('gem', 'assets/images/gem.png')
         this.load.image('spike', 'assets/images/triangle.png')
-        this.load.image('spark', 'assets/images/spark.png')
+        this.load.image('red', 'assets/images/red-partical.png')
+        this.load.image('blue', 'assets/images/blue-partical.png')
+        this.load.image('orange', 'assets/images/orange-partical.png')
+        this.load.image('green', 'assets/images/green-partical.png')
     }
 
     create() {

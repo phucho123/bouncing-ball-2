@@ -39,7 +39,7 @@ export class ObjectManager {
         this.fallSpeed = 8
         this.timeToChangeColor = 5
         this.colorIndex = 0
-        this.timeToSpawnPipe = 40
+        this.timeToSpawnPipe = 35
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
@@ -74,7 +74,7 @@ export class ObjectManager {
 
         this.perfect = false
         this.emitter = this.scene.add
-            .particles(100, 150, 'spark', {
+            .particles(100, 150, 'red', {
                 lifespan: 2000,
                 speed: { min: 100, max: 200 },
                 scale: { start: 0.8, end: 0 },
@@ -354,6 +354,22 @@ export class ObjectManager {
             this.timeToChangeColor = 5
             for (const pipe of this.pipes) {
                 pipe.fillColor = this.colors[this.colorIndex]
+            }
+            switch (this.colorIndex) {
+                case 0:
+                    this.emitter.setTexture('red')
+                    break
+                case 1:
+                    this.emitter.setTexture('blue')
+                    break
+                case 2:
+                    this.emitter.setTexture('orange')
+                    break
+                case 3:
+                    this.emitter.setTexture('green')
+                    break
+                default:
+                    break
             }
         }
     }
