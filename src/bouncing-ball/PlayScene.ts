@@ -30,6 +30,9 @@ export class PlayScene extends Phaser.Scene {
         this.load.image('blue', 'assets/images/blue-partical.png')
         this.load.image('orange', 'assets/images/orange-partical.png')
         this.load.image('green', 'assets/images/green-partical.png')
+        this.load.image('blackfire', 'assets/images/blackfire.png')
+        this.load.image('whitefire', 'assets/images/whitefire.png')
+        this.load.image('firegem', 'assets/images/fire-gem.png')
     }
 
     create() {
@@ -81,8 +84,6 @@ export class PlayScene extends Phaser.Scene {
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
 
         this.objectManager.checkOutOfBound()
-        if (PlayScene.start) {
-            this.objectManager.update(delta)
-        }
+        this.objectManager.update(delta)
     }
 }

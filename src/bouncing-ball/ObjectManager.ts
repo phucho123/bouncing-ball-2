@@ -25,6 +25,8 @@ export class ObjectManager {
     private delta: number
     private combo: number
     private comboDisplay: Phaser.GameObjects.Text
+    private fireEmitter: Phaser.GameObjects.Particles.ParticleEmitter
+    private timeToFire: number
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -43,6 +45,7 @@ export class ObjectManager {
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
+        this.timeToFire = 0
 
         this.comboDisplay = this.scene.add
             .text(100, 200, 'Perfect', {
@@ -53,6 +56,7 @@ export class ObjectManager {
             })
             .setAlpha(0)
             .setOrigin(0.5)
+            .setDepth(10)
         this.combo = 0
     }
 
@@ -90,6 +94,9 @@ export class ObjectManager {
                 PlayScene.score++
                 this.timeToChangeColor--
                 PlayScene.start = true
+                if (this.timeToFire > 0) {
+                    this.timeToFire--
+                }
                 this.emitter.setPosition(this.ball.x, this.ball.y + this.ball.displayWidth / 2)
                 if (!this.emitter.visible) this.emitter.setVisible(true)
                 if (this.perfect) {
@@ -104,6 +111,20 @@ export class ObjectManager {
                     this.emitter.explode(3)
                 }
             })
+        this.fireEmitter = this.scene.add
+            .particles(this.ball.x, this.ball.y, 'whitefire', {
+                color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
+                x: 0,
+                y: 0,
+                lifespan: 500,
+                angle: { min: -100, max: -80 },
+                scale: { start: 0.4, end: 0 },
+                speed: { min: 200, max: 300 },
+                advance: 2000,
+                emitting: false,
+            })
+            .setDepth(3)
+            .setVisible(false)
 
         this.scene.input.on('pointerdown', () => {
             if (!PlayScene.gameOver)
@@ -191,7 +212,7 @@ export class ObjectManager {
 
         const newPipeFilter = this.pipes.filter((pipe) => pipe.x + pipe.displayWidth / 2 <= 0)
         if (newPipeFilter.length == 0) {
-            newPipe = this.scene.add.rectangle(x, y, width, height, 0xff0000)
+            newPipe = this.scene.add.rectangle(x, y, width, height, 0xff0000).setDepth(0)
             console.log('create New Pipe')
             this.pipes.push(newPipe)
         } else {
@@ -215,7 +236,8 @@ export class ObjectManager {
             (gem) => gem.x + gem.displayWidth / 2 <= 0 || gem.alpha == 0
         )
         if (newGemFilter.length == 0) {
-            newGem = this.scene.add.image(x, y, 'gem').setScale(0.3)
+            newGem = this.scene.add.image(x, y, 'gem')
+            newGem.setScale(20 / newGem.width)
             this.gems.push(newGem)
             console.log('create New Gem')
         } else {
@@ -223,6 +245,14 @@ export class ObjectManager {
         }
 
         if (newGem) {
+            const prob = Phaser.Math.Between(1, 100) % 5
+            if (prob == 0) {
+                newGem.setTexture('firegem')
+                newGem.setScale(20 / newGem.width)
+            } else {
+                newGem.setTexture('gem')
+                newGem.setScale(20 / newGem.width)
+            }
             newGem.setState(0)
             newGem.setAlpha(1)
             newGem.setPosition(x, y - newGem.displayHeight / 2)
@@ -253,7 +283,7 @@ export class ObjectManager {
                 const spike = this.spikes.filter(
                     (spike) => spike.x < x && spike.x > x - width / 2
                 )[0]
-                if (spike) PlayScene.gameOver = true
+                if (spike && this.timeToFire <= 0) PlayScene.gameOver = true
             } else if (diff_x > width / 6) {
                 hitpoint.setX(x + width / 3)
                 this.combo = 0
@@ -261,7 +291,7 @@ export class ObjectManager {
                 const spike = this.spikes.filter(
                     (spike) => spike.x > x && spike.x < x + width / 2
                 )[0]
-                if (spike) PlayScene.gameOver = true
+                if (spike && this.timeToFire <= 0) PlayScene.gameOver = true
             } else {
                 hitpoint.setX(x)
                 this.combo++
@@ -271,6 +301,13 @@ export class ObjectManager {
                     gem.setAlpha(0)
                     PlayScene.score += 5
                     ShopScene.playerGem++
+                    if (gem.texture.key == 'firegem') {
+                        if (this.timeToFire <= 0) {
+                            this.fireEmitter.start()
+                            this.fireEmitter.setVisible(true)
+                        }
+                        this.timeToFire += 10
+                    }
                 }
             }
             hitpoint.fillColor = this.colors[this.colorIndex]
@@ -385,25 +422,32 @@ export class ObjectManager {
 
     update(delta: number) {
         this.delta = delta
-        if (this.perfect) {
-            if (this.combo >= 2) this.comboDisplay.setText(`Perfect x${this.combo}`)
-            else {
-                this.comboDisplay.setText('Perfect')
-            }
-            this.comboDisplay
-                .setPosition(
-                    this.ball.x,
-                    this.ball.y -
-                        this.ball.displayWidth / 2 -
-                        this.comboDisplay.displayHeight / 2 -
-                        30
-                )
-                .setAlpha(1)
-        } else {
-            this.comboDisplay.setAlpha(0)
+        if (this.fireEmitter.visible) this.fireEmitter.setPosition(this.ball.x, this.ball.y)
+        if (this.timeToFire <= 0) {
+            this.fireEmitter.stop()
+            this.fireEmitter.setVisible(false)
         }
-        this.createObject()
-        this.moveFloor()
+        if (PlayScene.start) {
+            if (this.perfect) {
+                if (this.combo >= 2) this.comboDisplay.setText(`Perfect x${this.combo}`)
+                else {
+                    this.comboDisplay.setText('Perfect')
+                }
+                this.comboDisplay
+                    .setPosition(
+                        this.ball.x,
+                        this.ball.y -
+                            this.ball.displayWidth / 2 -
+                            this.comboDisplay.displayHeight / 2 -
+                            30
+                    )
+                    .setAlpha(1)
+            } else {
+                this.comboDisplay.setAlpha(0)
+            }
+            this.createObject()
+            this.moveFloor()
+        }
     }
 
     moveFloor() {
@@ -444,6 +488,9 @@ export class ObjectManager {
         PlayScene.gameOver = false
         this.cnt = this.timeToSpawnPipe
         this.comboDisplay.setAlpha(0)
+        this.timeToFire = 0
+        this.fireEmitter.stop()
+        this.fireEmitter.setVisible(false)
 
         this.clearArr(this.floors)
         this.clearArr(this.pipes)
