@@ -17,13 +17,24 @@ export class ShopScene extends Phaser.Scene {
         this.load.image('basketball', 'assets/images/ball.png')
         this.load.image('pokeball', 'assets/images/poke-ball.png')
         this.load.image('football', 'assets/images/football.png')
+        this.load.image('volleyball', 'assets/images/volleyball.png')
+        this.load.image('cannonbolt', 'assets/images/cannonbolt.png')
+        this.load.image('dragonball', 'assets/images/dragonball.png')
         this.load.image('back', 'assets/images/back.png')
         this.load.image('gem', 'assets/images/gem.png')
     }
     create() {
         this.balls = []
-        this.ballKey = ['normalball', 'basketball', 'pokeball', 'football']
-        this.gemNeedToPay = [0, 10, 20, 30]
+        this.ballKey = [
+            'normalball',
+            'basketball',
+            'pokeball',
+            'football',
+            'volleyball',
+            'cannonbolt',
+            'dragonball',
+        ]
+        this.gemNeedToPay = [0, 10, 20, 30, 40, 50, 60]
         this.gemNeedToPayDisplay = []
         this.getBoughtBall()
 

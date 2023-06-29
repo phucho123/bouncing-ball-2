@@ -37,11 +37,11 @@ export class ObjectManager {
         this.hitPoints = []
         this.colors = [0xf07878, 0x9ad2f5, 0xf5d095, 0xacfabd]
         this.floorSpeed = -2.5
-        this.jumpSpeed = -8
-        this.fallSpeed = 8
+        this.jumpSpeed = -9
+        this.fallSpeed = 9
         this.timeToChangeColor = 5
         this.colorIndex = 0
-        this.timeToSpawnPipe = 45
+        this.timeToSpawnPipe = 60
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
@@ -118,10 +118,11 @@ export class ObjectManager {
                 y: 0,
                 lifespan: 500,
                 angle: { min: -100, max: -80 },
-                scale: { start: 0.4, end: 0 },
+                scale: { start: 0.4, end: 0, ease: 'sine.in' },
                 speed: { min: 200, max: 300 },
                 advance: 2000,
                 emitting: false,
+                colorEase: 'quart.out',
             })
             .setDepth(3)
             .setVisible(false)
@@ -300,13 +301,16 @@ export class ObjectManager {
                 if (gem && gem.alpha) {
                     gem.setAlpha(0)
                     PlayScene.score += 5
-                    ShopScene.playerGem++
                     if (gem.texture.key == 'firegem') {
                         if (this.timeToFire <= 0) {
                             this.fireEmitter.start()
                             this.fireEmitter.setVisible(true)
+                            const tmp = document.getElementById('game')
+                            if (tmp) tmp.style.backgroundColor = '#000000'
                         }
-                        this.timeToFire += 10
+                        this.timeToFire += 20
+                    } else {
+                        ShopScene.playerGem++
                     }
                 }
             }
@@ -426,6 +430,8 @@ export class ObjectManager {
         if (this.timeToFire <= 0) {
             this.fireEmitter.stop()
             this.fireEmitter.setVisible(false)
+            // const tmp2 = document.getElementById('game')
+            // if (tmp2) tmp2.style.backgroundColor = '#ebf9fa'
         }
         if (PlayScene.start) {
             if (this.perfect) {
@@ -451,7 +457,6 @@ export class ObjectManager {
     }
 
     moveFloor() {
-        this.ball.setMass((3 * this.delta) / DELTA_TIME)
         this.emitter.setX(this.emitter.x + (this.floorSpeed * this.delta) / DELTA_TIME)
         this.emitter.setY(this.emitter.y + (this.floorDownSpeed * this.delta) / DELTA_TIME)
 
@@ -506,6 +511,9 @@ export class ObjectManager {
             CANVAS_WIDTH / 2,
             this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
         )
+
+        // const tmp2 = document.getElementById('game')
+        // if (tmp2) tmp2.style.backgroundColor = '#ebf9fa'
     }
 
     clearArr(
