@@ -1,12 +1,12 @@
 import { BALL_SIZE, CANVAS_WIDTH } from './constant'
 
 export class ShopScene extends Phaser.Scene {
-    private balls: Phaser.GameObjects.Image[]
     public static chosenBall: number
+    public static playerGem: number
+    private balls: Phaser.GameObjects.Image[]
     private ballKey: string[]
     private gemNeedToPay: number[]
     private gemNeedToPayDisplay: Phaser.GameObjects.Text[]
-    public static playerGem: number
     private playerGameDisplay: Phaser.GameObjects.Text
 
     constructor() {
@@ -25,6 +25,7 @@ export class ShopScene extends Phaser.Scene {
         this.load.image('back', 'assets/images/back.png')
         this.load.image('gem', 'assets/images/gem.png')
     }
+
     public create() {
         this.balls = []
         this.ballKey = [
@@ -68,6 +69,7 @@ export class ShopScene extends Phaser.Scene {
             .setOrigin(1, 0)
         this.createBallList()
     }
+
     public createBall(key: string, x: number, y: number, number: number) {
         const ball = this.add.image(x, y, key).setOrigin(0)
         ball.setScale(100 / ball.width)

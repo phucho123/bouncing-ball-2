@@ -4,6 +4,7 @@ import { ShopScene } from './ShopScene'
 import { BALL_SIZE, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class ObjectManager {
+    private static instance: ObjectManager | null = null
     private scene: Phaser.Scene
     private gems: Phaser.GameObjects.Image[]
     private spikes: Phaser.GameObjects.Image[]
@@ -60,13 +61,24 @@ export class ObjectManager {
         this.combo = 0
     }
 
-    initial() {
-        this.ball = this.scene.matter.add.image(0, 0, 'normalball')
+    public static getInstance(scene: Phaser.Scene) {
+        if (!ObjectManager.instance) {
+            ObjectManager.instance = new ObjectManager(scene)
+        }
+        return ObjectManager.instance
+    }
 
+    public initial() {
         for (let i = 2; i <= 4; i++) {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
 
+        this.initialBall()
+        this.initialEmitter()
+    }
+
+    public initialBall() {
+        this.ball = this.scene.matter.add.image(0, 0, 'normalball')
         this.ball
             .setScale(BALL_SIZE / this.ball.width)
             .setCircle(this.ball.displayWidth / 2)
@@ -74,10 +86,7 @@ export class ObjectManager {
             .setBounce(0)
             .setMass(3)
             .setDepth(5)
-            .setPosition(
-                CANVAS_WIDTH / 2,
-                this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
-            )
+            .setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
             .setOnCollide(() => {
                 this.ball.setVelocity(0, Math.max((this.jumpSpeed * this.delta) / DELTA_TIME, -12))
                 PlayScene.score++
@@ -100,15 +109,13 @@ export class ObjectManager {
                     this.emitter.explode(3)
                 }
             })
-
-        this.initialEmitter()
         this.scene.input.on('pointerdown', () => {
             if (!PlayScene.gameOver)
                 this.ball.setVelocity(0, (this.fallSpeed * this.delta) / DELTA_TIME)
         })
     }
 
-    initialEmitter() {
+    public initialEmitter() {
         this.emitter = this.scene.add
             .particles(100, 150, 'red', {
                 lifespan: 2000,
@@ -136,7 +143,7 @@ export class ObjectManager {
             .setVisible(false)
     }
 
-    setFloorCollideEvent(newFloor: Phaser.Physics.Matter.Image) {
+    public setFloorCollideEvent(newFloor: Phaser.Physics.Matter.Image) {
         newFloor.setOnCollide(() => {
             if (newFloor) {
                 newFloor.setState(1)
@@ -172,7 +179,7 @@ export class ObjectManager {
         })
     }
 
-    createFloor(x: number | null, y: number, scaleX: number) {
+    public createFloor(x: number | null, y: number, scaleX: number) {
         let newFloor: Phaser.Physics.Matter.Image | undefined
 
         const newFloorFilter = this.floors.filter((floor) => floor.x + floor.displayWidth / 2 <= 0)
@@ -211,7 +218,7 @@ export class ObjectManager {
         }
     }
 
-    createPipe(x: number, y: number, width: number, height: number) {
+    public createPipe(x: number, y: number, width: number, height: number) {
         let newPipe
 
         const newPipeFilter = this.pipes.filter((pipe) => pipe.x + pipe.displayWidth / 2 <= 0)
@@ -231,7 +238,7 @@ export class ObjectManager {
         }
     }
 
-    createGem(x: number, y: number) {
+    public createGem(x: number, y: number) {
         const prob = Phaser.Math.Between(0, 100) % 5
         if (prob != 0) return
         let newGem
@@ -263,7 +270,7 @@ export class ObjectManager {
         }
     }
 
-    createHitpoint(x: number, y: number, width: number, height: number, diff_x: number) {
+    public createHitpoint(x: number, y: number, width: number, height: number, diff_x: number) {
         let hitpoint: Phaser.GameObjects.Rectangle | undefined
         const newHitpointFilter = this.hitPoints.filter(
             (hitpoint) => hitpoint.x + hitpoint.displayWidth / 2 <= 0
@@ -323,7 +330,7 @@ export class ObjectManager {
         }
     }
 
-    createSpike(x: number, y: number, width: number, scaleX: number) {
+    public createSpike(x: number, y: number, width: number, scaleX: number) {
         if (scaleX < 1.1) return
         const tmp = Phaser.Math.Between(0, 5)
         if (tmp != 3) return
@@ -354,7 +361,7 @@ export class ObjectManager {
         }
     }
 
-    createObject() {
+    public createObject() {
         this.ball.rotation += (Phaser.Math.DEG_TO_RAD * 3 * this.delta) / DELTA_TIME
         this.cnt -= Math.round((1 * this.delta) / DELTA_TIME)
         if (this.cnt <= 0) {
@@ -367,13 +374,13 @@ export class ObjectManager {
         }
     }
 
-    handleGameOver() {
+    public handleGameOver() {
         GameOverScene.score = PlayScene.score
         this.restart()
         this.scene.scene.switch('Game Over Scene')
     }
 
-    changeColor() {
+    public changeColor() {
         if (this.timeToChangeColor <= 0) {
             this.colorIndex = (this.colorIndex + 1) % this.colors.length
             this.timeToChangeColor = 5
@@ -399,7 +406,7 @@ export class ObjectManager {
         }
     }
 
-    checkOutOfBoundOfArray(
+    public checkOutOfBoundOfArray(
         arr: (
             | Phaser.GameObjects.Rectangle
             | Phaser.Physics.Matter.Image
@@ -421,14 +428,14 @@ export class ObjectManager {
         }
     }
 
-    checkOutOfBound() {
+    public checkOutOfBound() {
         if (this.ball.y >= this.ball.displayHeight / 2 + CANVAS_HEIGHT || this.ball.x <= 0) {
             console.log('Game Over')
             PlayScene.gameOver = true
         }
     }
 
-    update(delta: number) {
+    public update(delta: number) {
         this.delta = delta
         if (this.fireEmitter.visible) this.fireEmitter.setPosition(this.ball.x, this.ball.y)
         if (this.timeToFire <= 0) {
@@ -458,7 +465,7 @@ export class ObjectManager {
         }
     }
 
-    moveFloor() {
+    public moveFloor() {
         this.emitter.setX(this.emitter.x + (this.floorSpeed * this.delta) / DELTA_TIME)
         this.emitter.setY(this.emitter.y + (this.floorDownSpeed * this.delta) / DELTA_TIME)
 
@@ -471,7 +478,7 @@ export class ObjectManager {
         this.moveGameObject(this.hitPoints)
     }
 
-    moveGameObject(
+    public moveGameObject(
         arr: (
             | Phaser.GameObjects.Rectangle
             | Phaser.Physics.Matter.Image
@@ -486,7 +493,7 @@ export class ObjectManager {
         }
     }
 
-    restart() {
+    public restart() {
         this.emitter.setVisible(false)
         this.ball.setVelocity(0, 0)
         this.timeToChangeColor = 5
@@ -510,13 +517,10 @@ export class ObjectManager {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
 
-        this.ball.setPosition(
-            CANVAS_WIDTH / 2,
-            this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
-        )
+        this.ball.setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
     }
 
-    clearArr(
+    public clearArr(
         arr: (
             | Phaser.GameObjects.Rectangle
             | Phaser.Physics.Matter.Image
@@ -528,7 +532,7 @@ export class ObjectManager {
         }
     }
 
-    changeBall(ball: string) {
+    public changeBall(ball: string) {
         this.ball.setTexture(ball)
         this.ball.setScale(BALL_SIZE / this.ball.width)
     }

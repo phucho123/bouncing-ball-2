@@ -45,7 +45,7 @@ export class PlayScene extends Phaser.Scene {
         PlayScene.start = false
         PlayScene.gameOver = false
         PlayScene.score = 0
-        this.objectManager = new ObjectManager(this)
+        this.objectManager = ObjectManager.getInstance(this)
         this.balls = [
             'normalball',
             'basketball',
