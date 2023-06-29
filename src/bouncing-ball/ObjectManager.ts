@@ -494,12 +494,12 @@ export class ObjectManager {
     }
 
     public restart() {
-        this.emitter.setVisible(false)
-        this.ball.setVelocity(0, 0)
-        this.timeToChangeColor = 5
         PlayScene.score = 0
         PlayScene.start = false
         PlayScene.gameOver = false
+        this.emitter.setVisible(false)
+        this.ball.setVelocity(0, 0)
+        this.timeToChangeColor = 5
         this.cnt = this.timeToSpawnPipe
         this.comboDisplay.setAlpha(0)
         this.combo = 0
