@@ -15,23 +15,6 @@ export class StartScene extends Phaser.Scene {
     }
 
     public create() {
-        this.text = this.add
-            .text(60, 100, 'Bouncing\n   Ball 2', {
-                fontSize: `${(64 * CANVAS_WIDTH) / 400}px`,
-                fontFamily: 'Arial',
-                color: '#000000',
-                testString: '1234y',
-            })
-            .setStroke('black', 1)
-            .setOrigin(0.5)
-            .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
-
-        this.createButton()
-
-        this.updateFromStorage()
-    }
-
-    public createButton() {
         const startButton = this.add
             .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 'start-button')
             .setScale(0.2)
@@ -85,9 +68,17 @@ export class StartScene extends Phaser.Scene {
         shopButton.on('pointerdown', () => {
             this.scene.switch('Shop Scene')
         })
-    }
+        this.text = this.add
+            .text(60, 100, 'Bouncing\n   Ball 2', {
+                fontSize: `${(64 * CANVAS_WIDTH) / 400}px`,
+                fontFamily: 'Arial',
+                color: '#000000',
+                testString: '1234y',
+            })
+            .setStroke('black', 1)
+            .setOrigin(0.5)
+            .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
 
-    public updateFromStorage() {
         const chosenBall = localStorage.getItem('chosenBall')
         if (chosenBall) {
             ShopScene.chosenBall = parseInt(chosenBall)

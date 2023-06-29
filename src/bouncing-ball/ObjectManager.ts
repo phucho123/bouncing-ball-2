@@ -61,47 +61,6 @@ export class ObjectManager {
     }
 
     public initial() {
-        this.initialBall()
-        this.initialEmitters()
-
-        for (let i = 2; i <= 4; i++) {
-            this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_HEIGHT / 1.7, 1)
-        }
-
-        this.scene.input.on('pointerdown', () => {
-            if (!PlayScene.gameOver)
-                this.ball.setVelocity(0, Math.min((this.fallSpeed * this.delta) / DELTA_TIME, 12))
-        })
-    }
-
-    public initialEmitters() {
-        this.emitter = this.scene.add
-            .particles(100, 150, 'red', {
-                lifespan: 2000,
-                speed: { min: 100, max: 200 },
-                scale: { start: 0.6, end: 0 },
-                gravityX: -500,
-                emitting: false,
-            })
-            .setScale(0.2)
-        this.fireEmitter = this.scene.add
-            .particles(this.ball.x, this.ball.y, 'whitefire', {
-                color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
-                x: 0,
-                y: 0,
-                lifespan: 500,
-                angle: { min: -100, max: -80 },
-                scale: { start: 0.4, end: 0, ease: 'sine.in' },
-                speed: { min: 200, max: 300 },
-                advance: 2000,
-                emitting: false,
-                colorEase: 'quart.out',
-            })
-            .setDepth(3)
-            .setVisible(false)
-    }
-
-    public initialBall() {
         this.ball = this.scene.matter.add.image(0, 0, 'normalball')
         this.ball
             .setScale(BALL_SIZE / this.ball.width)
@@ -133,6 +92,39 @@ export class ObjectManager {
                     this.emitter.explode(3)
                 }
             })
+        this.emitter = this.scene.add
+            .particles(100, 150, 'red', {
+                lifespan: 2000,
+                speed: { min: 100, max: 200 },
+                scale: { start: 0.6, end: 0 },
+                gravityX: -500,
+                emitting: false,
+            })
+            .setScale(0.2)
+        this.fireEmitter = this.scene.add
+            .particles(this.ball.x, this.ball.y, 'whitefire', {
+                color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
+                x: 0,
+                y: 0,
+                lifespan: 500,
+                angle: { min: -100, max: -80 },
+                scale: { start: 0.4, end: 0, ease: 'sine.in' },
+                speed: { min: 200, max: 300 },
+                advance: 2000,
+                emitting: false,
+                colorEase: 'quart.out',
+            })
+            .setDepth(3)
+            .setVisible(false)
+
+        for (let i = 2; i <= 4; i++) {
+            this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_HEIGHT / 1.7, 1)
+        }
+
+        this.scene.input.on('pointerdown', () => {
+            if (!PlayScene.gameOver)
+                this.ball.setVelocity(0, Math.min((this.fallSpeed * this.delta) / DELTA_TIME, 12))
+        })
     }
 
     public setFloorCollideEvent(newFloor: Phaser.Physics.Matter.Image) {
