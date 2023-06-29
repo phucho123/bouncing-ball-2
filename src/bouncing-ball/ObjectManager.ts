@@ -21,11 +21,11 @@ export class ObjectManager {
     private colorIndex: number
     private floorDownSpeed: number
     private emitter: Phaser.GameObjects.Particles.ParticleEmitter
+    private fireEmitter: Phaser.GameObjects.Particles.ParticleEmitter
     private perfect: boolean
     private delta: number
     private combo: number
     private comboDisplay: Phaser.GameObjects.Text
-    private fireEmitter: Phaser.GameObjects.Particles.ParticleEmitter
     private timeToFire: number
 
     constructor(scene: Phaser.Scene) {
@@ -51,7 +51,7 @@ export class ObjectManager {
             .text(100, 200, 'Perfect', {
                 fontSize: '20px',
                 fontFamily: 'Arial',
-                color: '#437a5b',
+                color: '#1c2070',
                 testString: '1234y',
             })
             .setAlpha(0)
@@ -68,15 +68,6 @@ export class ObjectManager {
         }
 
         this.perfect = false
-        this.emitter = this.scene.add
-            .particles(100, 150, 'red', {
-                lifespan: 2000,
-                speed: { min: 100, max: 200 },
-                scale: { start: 0.6, end: 0 },
-                gravityX: -500,
-                emitting: false,
-            })
-            .setScale(0.2)
 
         this.ball
             .setScale(BALL_SIZE / this.ball.width)
@@ -111,6 +102,26 @@ export class ObjectManager {
                     this.emitter.explode(3)
                 }
             })
+
+        this.initialEmitter()
+
+        this.scene.input.on('pointerdown', () => {
+            if (!PlayScene.gameOver)
+                this.ball.setVelocity(0, (this.fallSpeed * this.delta) / DELTA_TIME)
+        })
+    }
+
+    initialEmitter() {
+        this.emitter = this.scene.add
+            .particles(100, 150, 'red', {
+                lifespan: 2000,
+                speed: { min: 100, max: 200 },
+                scale: { start: 0.6, end: 0 },
+                gravityX: -500,
+                emitting: false,
+            })
+            .setScale(0.2)
+
         this.fireEmitter = this.scene.add
             .particles(this.ball.x, this.ball.y, 'whitefire', {
                 color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
@@ -126,11 +137,6 @@ export class ObjectManager {
             })
             .setDepth(3)
             .setVisible(false)
-
-        this.scene.input.on('pointerdown', () => {
-            if (!PlayScene.gameOver)
-                this.ball.setVelocity(0, (this.fallSpeed * this.delta) / DELTA_TIME)
-        })
     }
 
     setFloorCollideEvent(newFloor: Phaser.Physics.Matter.Image) {
@@ -491,6 +497,7 @@ export class ObjectManager {
         PlayScene.gameOver = false
         this.cnt = this.timeToSpawnPipe
         this.comboDisplay.setAlpha(0)
+        this.combo = 0
         this.timeToFire = 0
         this.fireEmitter.stop()
         this.fireEmitter.setVisible(false)
