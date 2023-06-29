@@ -41,7 +41,7 @@ export class ObjectManager {
         this.fallSpeed = 9
         this.timeToChangeColor = 5
         this.colorIndex = 0
-        this.timeToSpawnPipe = 60
+        this.timeToSpawnPipe = 50
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME

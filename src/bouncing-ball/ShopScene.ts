@@ -2,38 +2,42 @@ import { BALL_SIZE, CANVAS_WIDTH } from './constant'
 
 export class ShopScene extends Phaser.Scene {
     private balls: Phaser.GameObjects.Image[]
-    static chosenBall: number
+    public static chosenBall: number
     private ballKey: string[]
     private gemNeedToPay: number[]
     private gemNeedToPayDisplay: Phaser.GameObjects.Text[]
     public static playerGem: number
     private playerGameDisplay: Phaser.GameObjects.Text
+
     constructor() {
         super({ key: 'Shop Scene' })
     }
-    preload() {
+
+    public preload() {
         this.load.image('normalball', 'assets/sprites/ball.png')
         this.load.image('basketball', 'assets/images/ball.png')
         this.load.image('pokeball', 'assets/images/poke-ball.png')
         this.load.image('football', 'assets/images/football.png')
         this.load.image('volleyball', 'assets/images/volleyball.png')
+        this.load.image('tennisball', 'assets/images/tennisball.png')
         this.load.image('cannonbolt', 'assets/images/cannonbolt.png')
         this.load.image('dragonball', 'assets/images/dragonball.png')
         this.load.image('back', 'assets/images/back.png')
         this.load.image('gem', 'assets/images/gem.png')
     }
-    create() {
+    public create() {
         this.balls = []
         this.ballKey = [
             'normalball',
             'basketball',
-            'pokeball',
             'football',
             'volleyball',
+            'tennisball',
+            'pokeball',
             'cannonbolt',
             'dragonball',
         ]
-        this.gemNeedToPay = [0, 10, 20, 30, 40, 50, 60]
+        this.gemNeedToPay = [0, 10, 20, 30, 40, 50, 60, 70]
         this.gemNeedToPayDisplay = []
         this.getBoughtBall()
 
@@ -64,7 +68,7 @@ export class ShopScene extends Phaser.Scene {
             .setOrigin(1, 0)
         this.createBallList()
     }
-    createBall(key: string, x: number, y: number, number: number) {
+    public createBall(key: string, x: number, y: number, number: number) {
         const ball = this.add.image(x, y, key).setOrigin(0)
         ball.setScale(100 / ball.width)
             .setInteractive()
@@ -87,7 +91,8 @@ export class ShopScene extends Phaser.Scene {
         if (ShopScene.chosenBall == number) ball.setAlpha(0.3)
         this.balls.push(ball)
     }
-    createGemDisplay(x: number, y: number, gem: number) {
+
+    public createGemDisplay(x: number, y: number, gem: number) {
         const gemDisplay = this.add
             .text(x, y, `${gem}`, {
                 color: '0x000000',
@@ -97,7 +102,8 @@ export class ShopScene extends Phaser.Scene {
         gemDisplay.setY(y + gemDisplay.displayHeight / 2)
         this.gemNeedToPayDisplay.push(gemDisplay)
     }
-    createBallList() {
+
+    public createBallList() {
         const align =
             (CANVAS_WIDTH - Math.floor(CANVAS_WIDTH / (BALL_SIZE * 2)) * (BALL_SIZE * 2)) / 2
         const numBallInRow = Math.floor(CANVAS_WIDTH / (BALL_SIZE * 2))
@@ -117,11 +123,8 @@ export class ShopScene extends Phaser.Scene {
             )
         }
     }
-    update(): void {
-        this.playerGameDisplay.setText(`${ShopScene.playerGem}`)
-    }
 
-    getBoughtBall() {
+    public getBoughtBall() {
         const boughtBall = localStorage.getItem('boughtBall')
         if (boughtBall) {
             const arr = boughtBall.split(' ')
@@ -129,5 +132,9 @@ export class ShopScene extends Phaser.Scene {
                 this.gemNeedToPay[parseInt(number)] = 0
             }
         }
+    }
+
+    public update(): void {
+        this.playerGameDisplay.setText(`${ShopScene.playerGem}`)
     }
 }

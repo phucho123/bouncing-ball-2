@@ -23,6 +23,7 @@ export class PlayScene extends Phaser.Scene {
         this.load.image('pokeball', 'assets/images/poke-ball.png')
         this.load.image('football', 'assets/images/football.png')
         this.load.image('volleyball', 'assets/images/volleyball.png')
+        this.load.image('tennisball', 'assets/images/tennisball.png')
         this.load.image('cannonbolt', 'assets/images/cannonbolt.png')
         this.load.image('dragonball', 'assets/images/dragonball.png')
         this.load.image('pipe', 'assets/images/up-pipe.png')
@@ -40,7 +41,7 @@ export class PlayScene extends Phaser.Scene {
 
     create() {
         console.log('create play scene')
-        this.matter.world.setGravity(0, 0.5)
+        this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false
         PlayScene.gameOver = false
         PlayScene.score = 0
@@ -48,9 +49,10 @@ export class PlayScene extends Phaser.Scene {
         this.balls = [
             'normalball',
             'basketball',
-            'pokeball',
             'football',
             'volleyball',
+            'tennisball',
+            'pokeball',
             'cannonbolt',
             'dragonball',
         ]
