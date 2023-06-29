@@ -10,12 +10,12 @@ export class GameOverScene extends Phaser.Scene {
         super({ key: 'Game Over Scene' })
     }
 
-    preload() {
+    public preload() {
         this.load.image('replay-button', 'assets/images/replay.png')
         this.load.image('home-button', 'assets/images/home.png')
     }
 
-    create() {
+    public create() {
         const replayButton = this.add
             .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 'replay-button')
             .setInteractive()
@@ -63,7 +63,7 @@ export class GameOverScene extends Phaser.Scene {
             .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.7)
     }
 
-    update() {
+    public update() {
         if (GameOverScene.score > PlayScene.highScore) {
             PlayScene.highScore = GameOverScene.score
             localStorage.setItem('highScore', PlayScene.highScore.toString())
