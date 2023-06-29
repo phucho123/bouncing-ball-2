@@ -314,6 +314,7 @@ export class ObjectManager {
                         this.timeToFire += 20
                     } else {
                         ShopScene.playerGem++
+                        localStorage.setItem('totalGem', ShopScene.playerGem.toString())
                     }
                 }
             }
