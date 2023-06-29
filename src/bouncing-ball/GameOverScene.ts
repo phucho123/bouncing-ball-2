@@ -1,10 +1,10 @@
+import { PlayScene } from './PlayScene'
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
 
 export class GameOverScene extends Phaser.Scene {
     public static score: number
     private scoreDisplay: Phaser.GameObjects.Text
     private highScoreDisplay: Phaser.GameObjects.Text
-    public static highScore: number
 
     constructor() {
         super({ key: 'Game Over Scene' })
@@ -50,7 +50,7 @@ export class GameOverScene extends Phaser.Scene {
             .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
 
         this.highScoreDisplay = this.add
-            .text(100, 200, `High Score: ${GameOverScene.highScore}`, {
+            .text(100, 200, `High Score: ${PlayScene.highScore}`, {
                 fontSize: '32px',
                 fontFamily: 'Arial',
                 color: '#000000',
@@ -64,16 +64,11 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     update() {
-        const tmp = localStorage.getItem('highScore')
-        if (tmp != null) {
-            GameOverScene.highScore = parseInt(tmp)
-        } else GameOverScene.highScore = 0
-
-        if (GameOverScene.score > GameOverScene.highScore) {
-            GameOverScene.highScore = Math.max(GameOverScene.highScore, GameOverScene.score)
-            localStorage.setItem('highScore', GameOverScene.highScore.toString())
+        if (GameOverScene.score > PlayScene.highScore) {
+            PlayScene.highScore = GameOverScene.score
+            localStorage.setItem('highScore', PlayScene.highScore.toString())
         }
         this.scoreDisplay.setText(`Score: ${GameOverScene.score}`)
-        this.highScoreDisplay.setText(`High Score: ${GameOverScene.highScore}`)
+        this.highScoreDisplay.setText(`High Score: ${PlayScene.highScore}`)
     }
 }

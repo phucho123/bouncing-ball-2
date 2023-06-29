@@ -8,7 +8,7 @@ export class ShopScene extends Phaser.Scene {
     private gemNeedToPayDisplay: Phaser.GameObjects.Text[]
     public static playerGem: number
     private playerGameDisplay: Phaser.GameObjects.Text
-    private numberOfBallBought: number
+    // private numberOfBallBought: number
     constructor() {
         super({ key: 'Shop Scene' })
     }

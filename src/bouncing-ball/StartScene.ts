@@ -1,3 +1,4 @@
+import { PlayScene } from './PlayScene'
 import { ShopScene } from './ShopScene'
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
 
@@ -95,5 +96,9 @@ export class StartScene extends Phaser.Scene {
         if (!boughtBall) {
             localStorage.setItem('boughtBall', '0')
         }
+        const tmp = localStorage.getItem('highScore')
+        if (tmp != null) {
+            PlayScene.highScore = parseInt(tmp)
+        } else PlayScene.highScore = 0
     }
 }

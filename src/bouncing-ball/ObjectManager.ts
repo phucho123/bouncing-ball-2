@@ -386,7 +386,7 @@ export class ObjectManager {
     update(delta: number) {
         this.delta = delta
         if (this.perfect) {
-            if (this.combo >= 2) this.comboDisplay.setText(`Perfect X ${this.combo}`)
+            if (this.combo >= 2) this.comboDisplay.setText(`Perfect x${this.combo}`)
             else {
                 this.comboDisplay.setText('Perfect')
             }

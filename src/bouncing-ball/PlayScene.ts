@@ -7,6 +7,8 @@ export class PlayScene extends Phaser.Scene {
     public static gameOver: boolean
     public static score: number
     private scoreDisplay: Phaser.GameObjects.Text
+    public static highScore: number
+    private highScoreDisplay: Phaser.GameObjects.Text
     private objectManager: ObjectManager
     private balls: string[]
     private currentBall: number
@@ -51,16 +53,30 @@ export class PlayScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(0)
         this.scoreDisplay.setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
+
+        this.highScoreDisplay = this.add
+            .text(CANVAS_WIDTH / 2, 10, `High Score: ${PlayScene.highScore}`, {
+                fontSize: '32px',
+                fontFamily: 'Arial',
+                color: '#000000',
+            })
+            .setOrigin(0.5, 0)
         this.objectManager.initial()
     }
     update(time: number, delta: number): void {
+        // console.log(delta)
         this.matter.world.setGravity(0, (0.5 * delta) / DELTA_TIME)
         if (this.currentBall != ShopScene.chosenBall) {
             this.currentBall = ShopScene.chosenBall
             this.objectManager.changeBall(this.balls[this.currentBall])
         }
 
+        if (PlayScene.score > PlayScene.highScore) {
+            this.highScoreDisplay.setText(`HighScore: ${PlayScene.score}`)
+        }
+
         if (PlayScene.gameOver) this.objectManager.handleGameOver()
+
         this.objectManager.changeColor()
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
 
