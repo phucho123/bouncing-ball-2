@@ -4,7 +4,7 @@ import { ShopScene } from './ShopScene'
 import { BALL_SIZE, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
 
 export class ObjectManager {
-    private static instance: ObjectManager | null = null
+    public static instance: ObjectManager | null = null
     private scene: Phaser.Scene
     private gems: Phaser.GameObjects.Image[]
     private spikes: Phaser.GameObjects.Image[]
