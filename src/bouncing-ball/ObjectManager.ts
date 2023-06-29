@@ -37,8 +37,8 @@ export class ObjectManager {
         this.hitPoints = []
         this.colors = [0xf07878, 0x9ad2f5, 0xf5d095, 0xacfabd]
         this.floorSpeed = -2.5
-        this.jumpSpeed = -9
-        this.fallSpeed = 9
+        this.jumpSpeed = -10
+        this.fallSpeed = 10
         this.timeToChangeColor = 5
         this.colorIndex = 0
         this.timeToSpawnPipe = 50
@@ -46,7 +46,7 @@ export class ObjectManager {
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
         this.timeToFire = 0
-
+        this.perfect = false
         this.comboDisplay = this.scene.add
             .text(100, 200, 'Perfect', {
                 fontSize: '20px',
@@ -67,8 +67,6 @@ export class ObjectManager {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
         }
 
-        this.perfect = false
-
         this.ball
             .setScale(BALL_SIZE / this.ball.width)
             .setCircle(this.ball.displayWidth / 2)
@@ -81,7 +79,7 @@ export class ObjectManager {
                 this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
             )
             .setOnCollide(() => {
-                this.ball.setVelocity(0, Math.max((this.jumpSpeed * this.delta) / DELTA_TIME, -10))
+                this.ball.setVelocity(0, Math.max((this.jumpSpeed * this.delta) / DELTA_TIME, -12))
                 PlayScene.score++
                 this.timeToChangeColor--
                 PlayScene.start = true
@@ -104,7 +102,6 @@ export class ObjectManager {
             })
 
         this.initialEmitter()
-
         this.scene.input.on('pointerdown', () => {
             if (!PlayScene.gameOver)
                 this.ball.setVelocity(0, (this.fallSpeed * this.delta) / DELTA_TIME)
