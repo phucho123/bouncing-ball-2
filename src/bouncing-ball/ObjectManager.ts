@@ -430,8 +430,6 @@ export class ObjectManager {
         if (this.timeToFire <= 0) {
             this.fireEmitter.stop()
             this.fireEmitter.setVisible(false)
-            // const tmp2 = document.getElementById('game')
-            // if (tmp2) tmp2.style.backgroundColor = '#ebf9fa'
         }
         if (PlayScene.start) {
             if (this.perfect) {
@@ -511,9 +509,6 @@ export class ObjectManager {
             CANVAS_WIDTH / 2,
             this.floors[0].y - this.floors[0].displayHeight / 2 - CANVAS_HEIGHT / 2
         )
-
-        // const tmp2 = document.getElementById('game')
-        // if (tmp2) tmp2.style.backgroundColor = '#ebf9fa'
     }
 
     clearArr(

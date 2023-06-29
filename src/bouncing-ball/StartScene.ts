@@ -15,8 +15,6 @@ export class StartScene extends Phaser.Scene {
     }
 
     create() {
-        // const tmp2 = document.getElementById('game')
-        // if (tmp2) tmp2.style.backgroundColor = '#ebf9fa'
         const startButton = this.add
             .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 'start-button')
             .setScale(0.2)

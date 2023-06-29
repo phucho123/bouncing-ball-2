@@ -10,7 +10,6 @@ export const config = {
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
     backgroundColor: '#ebf9fa',
-    // transparent: true,
     parent: 'game',
     physics: {
         default: 'matter',

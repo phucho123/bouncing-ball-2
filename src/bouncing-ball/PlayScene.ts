@@ -78,7 +78,6 @@ export class PlayScene extends Phaser.Scene {
         this.objectManager.initial()
     }
     update(time: number, delta: number): void {
-        // console.log(delta)
         this.matter.world.setGravity(0, (0.5 * delta) / DELTA_TIME)
         if (this.currentBall != ShopScene.chosenBall) {
             this.currentBall = ShopScene.chosenBall
