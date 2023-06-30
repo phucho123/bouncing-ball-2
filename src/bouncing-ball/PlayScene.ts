@@ -18,25 +18,7 @@ export class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('normalball', 'assets/sprites/ball.png')
-        this.load.image('basketball', 'assets/images/ball.png')
-        this.load.image('pokeball', 'assets/images/poke-ball.png')
-        this.load.image('football', 'assets/images/football.png')
-        this.load.image('volleyball', 'assets/images/volleyball.png')
-        this.load.image('tennisball', 'assets/images/tennisball.png')
-        this.load.image('cannonbolt', 'assets/images/cannonbolt.png')
-        this.load.image('dragonball', 'assets/images/dragonball.png')
-        this.load.image('pipe', 'assets/images/up-pipe.png')
-        this.load.image('floor', 'assets/images/floor.png')
-        this.load.image('gem', 'assets/images/gem.png')
-        this.load.image('spike', 'assets/images/triangle.png')
-        this.load.image('red', 'assets/images/red-partical.png')
-        this.load.image('blue', 'assets/images/blue-partical.png')
-        this.load.image('orange', 'assets/images/orange-partical.png')
-        this.load.image('green', 'assets/images/green-partical.png')
-        this.load.image('blackfire', 'assets/images/blackfire.png')
-        this.load.image('whitefire', 'assets/images/whitefire.png')
-        this.load.image('firegem', 'assets/images/fire-gem.png')
+        ///
     }
 
     create() {

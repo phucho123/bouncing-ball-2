@@ -1,3 +1,4 @@
+import { AudioManager } from './AudioManager'
 import { GameOverScene } from './GameOverScene'
 import { PlayScene } from './PlayScene'
 import { ShopScene } from './ShopScene'
@@ -28,6 +29,7 @@ export class ObjectManager {
     private combo: number
     private comboDisplay: Phaser.GameObjects.Text
     private timeToFire: number
+    private audioManager: AudioManager
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -59,6 +61,7 @@ export class ObjectManager {
             .setOrigin(0.5)
             .setDepth(10)
         this.combo = 0
+        this.audioManager = AudioManager.getInstance(this.scene)
     }
 
     public static getInstance(scene: Phaser.Scene) {
@@ -75,6 +78,7 @@ export class ObjectManager {
 
         this.initialBall()
         this.initialEmitter()
+        this.audioManager.init()
     }
 
     public initialBall() {
@@ -88,6 +92,7 @@ export class ObjectManager {
             .setDepth(5)
             .setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
             .setOnCollide(() => {
+                this.audioManager.playHitAudio()
                 this.ball.setVelocity(0, Math.max((this.jumpSpeed * this.delta) / DELTA_TIME, -12))
                 PlayScene.score++
                 this.timeToChangeColor--
@@ -295,7 +300,10 @@ export class ObjectManager {
                 const spike = this.spikes.filter(
                     (spike) => spike.x < x && spike.x > x - width / 2
                 )[0]
-                if (spike && this.timeToFire <= 0) PlayScene.gameOver = true
+                if (spike && this.timeToFire <= 0) {
+                    PlayScene.gameOver = true
+                    this.audioManager.playSpikeAudio()
+                }
             } else if (diff_x > width / 6) {
                 hitpoint.setX(x + width / 3)
                 this.combo = 0
@@ -303,7 +311,10 @@ export class ObjectManager {
                 const spike = this.spikes.filter(
                     (spike) => spike.x > x && spike.x < x + width / 2
                 )[0]
-                if (spike && this.timeToFire <= 0) PlayScene.gameOver = true
+                if (spike && this.timeToFire <= 0) {
+                    PlayScene.gameOver = true
+                    this.audioManager.playSpikeAudio()
+                }
             } else {
                 hitpoint.setX(x)
                 this.combo++
@@ -318,12 +329,14 @@ export class ObjectManager {
                             this.fireEmitter.setVisible(true)
                             const tmp = document.getElementById('game')
                             if (tmp) tmp.style.backgroundColor = '#000000'
+                            this.audioManager.playFireAudio()
                         }
                         this.timeToFire += 20
                     } else {
                         ShopScene.playerGem++
                         localStorage.setItem('totalGem', ShopScene.playerGem.toString())
                     }
+                    this.audioManager.playGemAudio()
                 }
             }
             hitpoint.fillColor = this.colors[this.colorIndex]
@@ -410,6 +423,7 @@ export class ObjectManager {
     public checkOutOfBound() {
         if (this.ball.y >= this.ball.displayHeight / 2 + CANVAS_HEIGHT || this.ball.x <= 0) {
             console.log('Game Over')
+            this.audioManager.playDieAudio()
             PlayScene.gameOver = true
         }
     }
@@ -418,6 +432,7 @@ export class ObjectManager {
         this.delta = delta
         if (this.fireEmitter.visible) this.fireEmitter.setPosition(this.ball.x, this.ball.y)
         if (this.timeToFire <= 0) {
+            this.audioManager.pauseFireAudio()
             this.fireEmitter.stop()
             this.fireEmitter.setVisible(false)
         }
@@ -491,6 +506,8 @@ export class ObjectManager {
         this.clearArr(this.spikes)
         this.clearArr(this.hitPoints)
         this.clearArr(this.gems)
+
+        this.audioManager.pauseFireAudio()
 
         for (let i = 2; i <= 4; i++) {
             this.createFloor(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)

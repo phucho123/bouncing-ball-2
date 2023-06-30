@@ -11,8 +11,7 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     public preload() {
-        this.load.image('replay-button', 'assets/images/replay.png')
-        this.load.image('home-button', 'assets/images/home.png')
+        ///
     }
 
     public create() {
