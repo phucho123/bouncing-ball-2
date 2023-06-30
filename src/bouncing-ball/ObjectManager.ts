@@ -193,7 +193,7 @@ export class ObjectManager {
         }
 
         if (newFloor) {
-            newFloor.setStatic(true).setY(y).setOrigin
+            newFloor.setStatic(true).setY(y)
             if (x == null) newFloor.setX(CANVAS_WIDTH + newFloor.displayWidth / 2)
             else newFloor.setX(x)
             newFloor.scaleX = scaleX
