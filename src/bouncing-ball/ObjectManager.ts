@@ -406,28 +406,6 @@ export class ObjectManager {
         }
     }
 
-    public checkOutOfBoundOfArray(
-        arr: (
-            | Phaser.GameObjects.Rectangle
-            | Phaser.Physics.Matter.Image
-            | Phaser.GameObjects.Image
-        )[],
-        extraArr: (
-            | Phaser.GameObjects.Rectangle
-            | Phaser.Physics.Matter.Image
-            | Phaser.GameObjects.Image
-        )[]
-    ) {
-        for (const item of arr) {
-            if (item.x + item.displayWidth / 2 <= 0) {
-                const removeItem = arr.shift()
-                if (removeItem != undefined) {
-                    extraArr.push(removeItem)
-                }
-            } else break
-        }
-    }
-
     public checkOutOfBound() {
         if (this.ball.y >= this.ball.displayHeight / 2 + CANVAS_HEIGHT || this.ball.x <= 0) {
             console.log('Game Over')
