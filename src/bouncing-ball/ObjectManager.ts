@@ -135,6 +135,7 @@ export class ObjectManager {
                 angle: { min: -100, max: -80 },
                 scale: { start: 0.4, end: 0, ease: 'sine.in' },
                 speed: { min: 200, max: 300 },
+                alpha: { start: 0.7, end: 0.3 },
                 advance: 2000,
                 emitting: false,
                 colorEase: 'quart.out',
