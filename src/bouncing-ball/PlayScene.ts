@@ -6,8 +6,8 @@ export class PlayScene extends Phaser.Scene {
     public static start: boolean
     public static gameOver: boolean
     public static score: number
-    private scoreDisplay: Phaser.GameObjects.Text
     public static highScore: number
+    private scoreDisplay: Phaser.GameObjects.Text
     private highScoreDisplay: Phaser.GameObjects.Text
     private objectManager: ObjectManager
     private balls: string[]
@@ -17,11 +17,11 @@ export class PlayScene extends Phaser.Scene {
         super({ key: 'Play Scene' })
     }
 
-    preload() {
+    public preload() {
         ///
     }
 
-    create() {
+    public create() {
         console.log('create play scene')
         this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false
@@ -61,7 +61,7 @@ export class PlayScene extends Phaser.Scene {
             .setOrigin(0.5, 0)
         this.objectManager.initial()
     }
-    update(time: number, delta: number): void {
+    public update(time: number, delta: number): void {
         this.matter.world.setGravity(0, Math.min((0.5 * delta) / DELTA_TIME, 1.2))
         if (this.currentBall != ShopScene.chosenBall) {
             this.currentBall = ShopScene.chosenBall
