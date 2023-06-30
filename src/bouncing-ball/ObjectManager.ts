@@ -95,7 +95,7 @@ export class ObjectManager {
                 if (this.timeToFire > 0) {
                     this.timeToFire--
                 }
-                this.emitter.setPosition(this.ball.x, this.ball.y + this.ball.displayWidth / 2)
+                this.emitter.setPosition(this.ball.x, this.ball.y + this.ball.displayHeight / 2)
                 if (!this.emitter.visible) this.emitter.setVisible(true)
                 if (this.perfect) {
                     this.emitter.gravityX = 0
