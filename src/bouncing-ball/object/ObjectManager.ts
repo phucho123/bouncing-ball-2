@@ -287,6 +287,39 @@ export class ObjectManager {
         }
     }
 
+    public move(): void {
+        if (this.emitter.hitEmitter.visible) {
+            this.emitter.moveHitEmitter(
+                (this.floorSpeed * this.delta) / DELTA_TIME,
+                (this.floorDownSpeed * this.delta) / DELTA_TIME
+            )
+        }
+
+        if (this.ball.x != 0) this.ball.setX(CANVAS_WIDTH / 2)
+
+        this.floors.move(
+            (this.floorSpeed * this.delta) / DELTA_TIME,
+            (this.floorDownSpeed * this.delta) / DELTA_TIME
+        )
+        this.pipes.move(
+            (this.floorSpeed * this.delta) / DELTA_TIME,
+            (this.floorDownSpeed * this.delta) / DELTA_TIME
+        )
+        this.spikes.move(
+            (this.floorSpeed * this.delta) / DELTA_TIME,
+            (this.floorDownSpeed * this.delta) / DELTA_TIME
+        )
+
+        this.gems.move(
+            (this.floorSpeed * this.delta) / DELTA_TIME,
+            (this.floorDownSpeed * this.delta) / DELTA_TIME
+        )
+        this.hitPoints.move(
+            (this.floorSpeed * this.delta) / DELTA_TIME,
+            (this.floorDownSpeed * this.delta) / DELTA_TIME
+        )
+    }
+
     public update(delta: number): void {
         this.delta = delta
         this.ball.rotation += (Phaser.Math.DEG_TO_RAD * 3 * this.delta) / DELTA_TIME
@@ -326,39 +359,6 @@ export class ObjectManager {
             }
             this.move()
         }
-    }
-
-    public move(): void {
-        if (this.emitter.hitEmitter.visible) {
-            this.emitter.moveHitEmitter(
-                (this.floorSpeed * this.delta) / DELTA_TIME,
-                (this.floorDownSpeed * this.delta) / DELTA_TIME
-            )
-        }
-
-        if (this.ball.x != 0) this.ball.setX(CANVAS_WIDTH / 2)
-
-        this.floors.move(
-            (this.floorSpeed * this.delta) / DELTA_TIME,
-            (this.floorDownSpeed * this.delta) / DELTA_TIME
-        )
-        this.pipes.move(
-            (this.floorSpeed * this.delta) / DELTA_TIME,
-            (this.floorDownSpeed * this.delta) / DELTA_TIME
-        )
-        this.spikes.move(
-            (this.floorSpeed * this.delta) / DELTA_TIME,
-            (this.floorDownSpeed * this.delta) / DELTA_TIME
-        )
-
-        this.gems.move(
-            (this.floorSpeed * this.delta) / DELTA_TIME,
-            (this.floorDownSpeed * this.delta) / DELTA_TIME
-        )
-        this.hitPoints.move(
-            (this.floorSpeed * this.delta) / DELTA_TIME,
-            (this.floorDownSpeed * this.delta) / DELTA_TIME
-        )
     }
 
     public restart(): void {

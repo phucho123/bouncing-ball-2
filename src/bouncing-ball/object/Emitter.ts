@@ -37,13 +37,12 @@ export class Emitter {
     }
 
     public startHitEmitter(perfect: boolean, delta: number): void {
-        if (perfect) {
+        if (!perfect) {
             this.hitEmitter.gravityX = (-500 * delta) / DELTA_TIME
             this.hitEmitter.gravityY = 0
             this.hitEmitter.explode(3)
         } else {
             this.hitEmitter.gravityX = 0
-            this.hitEmitter.speedX = 0
             this.hitEmitter.gravityY = (-500 * delta) / DELTA_TIME
             this.hitEmitter.explode(16)
         }
