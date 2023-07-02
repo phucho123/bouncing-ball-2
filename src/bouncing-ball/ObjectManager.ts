@@ -39,12 +39,12 @@ export class ObjectManager {
         this.spikes = []
         this.hitPoints = []
         this.colors = [0xf07878, 0x9ad2f5, 0xf5d095, 0xacfabd]
-        this.floorSpeed = -2.5
+        this.floorSpeed = -3
         this.jumpSpeed = -10
         this.fallSpeed = 10
         this.timeToChangeColor = 5
         this.colorIndex = 0
-        this.timeToSpawnPipe = 50
+        this.timeToSpawnPipe = 60
         this.cnt = this.timeToSpawnPipe
         this.floorDownSpeed = 2
         this.delta = DELTA_TIME
@@ -102,17 +102,6 @@ export class ObjectManager {
                 }
                 this.emitter.setPosition(this.ball.x, this.ball.y + this.ball.displayHeight / 2)
                 if (!this.emitter.visible) this.emitter.setVisible(true)
-                if (this.perfect) {
-                    this.emitter.gravityX = 0
-                    this.emitter.gravityY = (-500 * this.delta) / DELTA_TIME
-                    this.emitter.speed = (300 * this.delta) / DELTA_TIME
-                    this.emitter.explode(10)
-                } else {
-                    this.emitter.gravityX = (-500 * this.delta) / DELTA_TIME
-                    this.emitter.gravityY = 0
-                    this.emitter.speed = (150 * this.delta) / DELTA_TIME
-                    this.emitter.explode(3)
-                }
             })
         this.scene.input.on('pointerdown', () => {
             if (!PlayScene.gameOver)
@@ -125,7 +114,7 @@ export class ObjectManager {
             .particles(100, 150, 'red', {
                 lifespan: 2000,
                 speed: { min: 100, max: 200 },
-                scale: { start: 0.6, end: 0 },
+                scale: { start: 0.6, end: 0.1 },
                 gravityX: -500,
                 emitting: false,
             })
@@ -304,6 +293,9 @@ export class ObjectManager {
                     PlayScene.gameOver = true
                     this.audioManager.playSpikeAudio()
                 }
+                this.emitter.gravityX = (-500 * this.delta) / DELTA_TIME
+                this.emitter.gravityY = 0
+                this.emitter.explode(3)
             } else if (diff_x > width / 6) {
                 hitpoint.setX(x + width / 3)
                 this.combo = 0
@@ -315,6 +307,9 @@ export class ObjectManager {
                     PlayScene.gameOver = true
                     this.audioManager.playSpikeAudio()
                 }
+                this.emitter.gravityX = (-500 * this.delta) / DELTA_TIME
+                this.emitter.gravityY = 0
+                this.emitter.explode(3)
             } else {
                 hitpoint.setX(x)
                 this.combo++
@@ -338,6 +333,11 @@ export class ObjectManager {
                     }
                     this.audioManager.playGemAudio()
                 }
+
+                this.emitter.gravityX = 0
+                this.emitter.speedX = 0
+                this.emitter.gravityY = (-1000 * this.delta) / DELTA_TIME
+                this.emitter.explode(16)
             }
             hitpoint.fillColor = this.colors[this.colorIndex]
             hitpoint.setState(1)

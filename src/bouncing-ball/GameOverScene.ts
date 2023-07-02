@@ -15,6 +15,13 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     public create() {
+        this.add
+            .text(CANVAS_WIDTH / 2, 100, 'Game Over', {
+                color: '#000000',
+                fontSize: '32px',
+                fontFamily: 'Arial',
+            })
+            .setOrigin(0.5)
         const replayButton = this.add
             .image(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 'replay-button')
             .setInteractive()

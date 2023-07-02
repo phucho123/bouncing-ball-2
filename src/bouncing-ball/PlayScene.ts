@@ -17,10 +17,6 @@ export class PlayScene extends Phaser.Scene {
         super({ key: 'Play Scene' })
     }
 
-    public preload() {
-        ///
-    }
-
     public create() {
         console.log('create play scene')
         this.matter.world.setGravity(0, 0.4)

@@ -9,10 +9,6 @@ export class StartScene extends Phaser.Scene {
         super({ key: 'Start Scene' })
     }
 
-    public preload() {
-        ///
-    }
-
     public create() {
         this.createButton()
         this.text = this.add

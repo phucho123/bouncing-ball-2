@@ -13,10 +13,6 @@ export class ShopScene extends Phaser.Scene {
         super({ key: 'Shop Scene' })
     }
 
-    public preload() {
-        ///
-    }
-
     public create() {
         this.balls = []
         this.ballKey = [
