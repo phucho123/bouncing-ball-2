@@ -1,4 +1,6 @@
-import { CANVAS_WIDTH } from './constant'
+import { CANVAS_WIDTH } from '../constant/constant'
+import { PlayScene } from './PlayScene'
+import { ShopScene } from './ShopScene'
 
 export class LoadingScene extends Phaser.Scene {
     private graphics: Phaser.GameObjects.Graphics
@@ -9,7 +11,7 @@ export class LoadingScene extends Phaser.Scene {
         super({ key: 'Loading Scene' })
     }
 
-    public preload() {
+    public preload(): void {
         this.graphics = this.add.graphics()
         this.newGraphics = this.add.graphics()
         const progressBar = new Phaser.Geom.Rectangle(10, 200, CANVAS_WIDTH - 20, 50)
@@ -58,6 +60,8 @@ export class LoadingScene extends Phaser.Scene {
         this.load.audio('spike-audio', 'assets/audios/hit.wav')
         this.load.audio('fire-audio', 'assets/audios/fire.mp3')
 
+        this.getDataFromStorage()
+
         this.load.on('progress', this.updateBar, {
             newGraphics: this.newGraphics,
             loadingText: this.loadingText,
@@ -68,7 +72,7 @@ export class LoadingScene extends Phaser.Scene {
         })
     }
 
-    public updateBar(percentage: number) {
+    public updateBar(percentage: number): void {
         this.newGraphics.clear()
         this.newGraphics.fillStyle(0x3587e2, 1)
         this.newGraphics.fillRectShape(
@@ -77,5 +81,28 @@ export class LoadingScene extends Phaser.Scene {
 
         percentage = percentage * 100
         this.loadingText.setText('Loading: ' + percentage.toFixed(2) + '%')
+    }
+
+    public getDataFromStorage(): void {
+        const chosenBall = localStorage.getItem('chosenBall')
+        if (chosenBall) {
+            ShopScene.chosenBall = parseInt(chosenBall)
+        } else {
+            ShopScene.chosenBall = 0
+        }
+        const playerGem = localStorage.getItem('totalGem')
+        if (playerGem) {
+            ShopScene.playerGem = parseInt(playerGem)
+        } else {
+            ShopScene.playerGem = 0
+        }
+        const boughtBall = localStorage.getItem('boughtBall')
+        if (!boughtBall) {
+            localStorage.setItem('boughtBall', '0')
+        }
+        const tmp = localStorage.getItem('highScore')
+        if (tmp != null) {
+            PlayScene.highScore = parseInt(tmp)
+        } else PlayScene.highScore = 0
     }
 }

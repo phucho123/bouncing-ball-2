@@ -11,14 +11,14 @@ export class AudioManager {
         this.scene = scene
     }
 
-    public static getInstance(scene: Phaser.Scene) {
+    public static getInstance(scene: Phaser.Scene): AudioManager {
         if (!AudioManager.instance) {
             AudioManager.instance = new AudioManager(scene)
         }
         return AudioManager.instance
     }
 
-    public init() {
+    public init(): void {
         this.gemAudio = this.scene.sound.add('gem-audio') as Phaser.Sound.NoAudioSound
         this.gemAudio.setRate(1.5)
         this.hitAudio = this.scene.sound.add('hit-audio') as Phaser.Sound.NoAudioSound
@@ -31,43 +31,43 @@ export class AudioManager {
         this.spikeAudio.setRate(1.5)
     }
 
-    public playGemAudio() {
+    public playGemAudio(): void {
         this.gemAudio.play()
     }
 
-    public pauseGemAudio() {
+    public pauseGemAudio(): void {
         this.gemAudio.pause()
     }
 
-    public playHitAudio() {
+    public playHitAudio(): void {
         this.hitAudio.play()
     }
 
-    public pauseHitAudio() {
+    public pauseHitAudio(): void {
         this.hitAudio.pause()
     }
 
-    public playDieAudio() {
+    public playDieAudio(): void {
         this.dieAudio.play()
     }
 
-    public pauseDieAudio() {
+    public pauseDieAudio(): void {
         this.dieAudio.pause()
     }
 
-    public playFireAudio() {
+    public playFireAudio(): void {
         this.fireAudio.play()
     }
 
-    public pauseFireAudio() {
+    public pauseFireAudio(): void {
         this.fireAudio.pause()
     }
 
-    public playSpikeAudio() {
+    public playSpikeAudio(): void {
         this.spikeAudio.play()
     }
 
-    public pauseSpikeAudio() {
+    public pauseSpikeAudio(): void {
         this.spikeAudio.pause()
     }
 }

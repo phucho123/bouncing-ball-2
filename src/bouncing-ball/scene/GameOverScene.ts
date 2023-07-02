@@ -1,5 +1,5 @@
 import { PlayScene } from './PlayScene'
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './constant'
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constant/constant'
 
 export class GameOverScene extends Phaser.Scene {
     public static score: number
@@ -10,11 +10,7 @@ export class GameOverScene extends Phaser.Scene {
         super({ key: 'Game Over Scene' })
     }
 
-    public preload() {
-        ///
-    }
-
-    public create() {
+    public create(): void {
         this.add
             .text(CANVAS_WIDTH / 2, 100, 'Game Over', {
                 color: '#000000',
@@ -69,7 +65,7 @@ export class GameOverScene extends Phaser.Scene {
             .setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.7)
     }
 
-    public update() {
+    public update(): void {
         if (GameOverScene.score > PlayScene.highScore) {
             PlayScene.highScore = GameOverScene.score
             localStorage.setItem('highScore', PlayScene.highScore.toString())

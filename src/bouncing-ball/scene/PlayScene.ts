@@ -1,6 +1,6 @@
-import { ObjectManager } from './ObjectManager'
+import { ObjectManager } from '../object/ObjectManager'
 import { ShopScene } from './ShopScene'
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from './constant'
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from '../constant/constant'
 
 export class PlayScene extends Phaser.Scene {
     public static start: boolean
@@ -17,7 +17,7 @@ export class PlayScene extends Phaser.Scene {
         super({ key: 'Play Scene' })
     }
 
-    public create() {
+    public create(): void {
         console.log('create play scene')
         this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false

@@ -1,4 +1,4 @@
-import { config } from './config'
+import { config } from './config/config'
 
 export class GameManager {
     public static instance: GameManager | null = null
@@ -6,7 +6,7 @@ export class GameManager {
         new Phaser.Game(config)
     }
 
-    public static getInstance() {
+    public static getInstance(): GameManager {
         if (!GameManager.instance) {
             GameManager.instance = new GameManager()
         }

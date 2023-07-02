@@ -1,4 +1,4 @@
-import { BALL_SIZE, CANVAS_WIDTH } from './constant'
+import { BALL_SIZE, CANVAS_WIDTH } from '../constant/constant'
 
 export class ShopScene extends Phaser.Scene {
     public static chosenBall: number
@@ -13,7 +13,7 @@ export class ShopScene extends Phaser.Scene {
         super({ key: 'Shop Scene' })
     }
 
-    public create() {
+    public create(): void {
         this.balls = []
         this.ballKey = [
             'normalball',
@@ -57,7 +57,7 @@ export class ShopScene extends Phaser.Scene {
         this.createBallList()
     }
 
-    public createBall(key: string, x: number, y: number, number: number) {
+    public createBall(key: string, x: number, y: number, number: number): void {
         const ball = this.add.image(x, y, key).setOrigin(0)
         ball.setScale(100 / ball.width)
             .setInteractive()
@@ -92,7 +92,7 @@ export class ShopScene extends Phaser.Scene {
         this.gemNeedToPayDisplay.push(gemDisplay)
     }
 
-    public createBallList() {
+    public createBallList(): void {
         const align =
             (CANVAS_WIDTH - Math.floor(CANVAS_WIDTH / (BALL_SIZE * 2)) * (BALL_SIZE * 2)) / 2
         const numBallInRow = Math.floor(CANVAS_WIDTH / (BALL_SIZE * 2))
@@ -113,7 +113,7 @@ export class ShopScene extends Phaser.Scene {
         }
     }
 
-    public getBoughtBall() {
+    public getBoughtBall(): void {
         const boughtBall = localStorage.getItem('boughtBall')
         if (boughtBall) {
             const arr = boughtBall.split(' ')
