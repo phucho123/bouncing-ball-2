@@ -1,6 +1,6 @@
 import { ObjectManager } from '../object/ObjectManager'
 import { ShopScene } from './ShopScene'
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from '../constant/constant'
+import { BALLS, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from '../constant/constant'
 
 export class PlayScene extends Phaser.Scene {
     public static start: boolean
@@ -24,16 +24,7 @@ export class PlayScene extends Phaser.Scene {
         PlayScene.gameOver = false
         PlayScene.score = 0
         this.objectManager = ObjectManager.getInstance(this)
-        this.balls = [
-            'normalball',
-            'basketball',
-            'football',
-            'volleyball',
-            'tennisball',
-            'pokeball',
-            'cannonbolt',
-            'dragonball',
-        ]
+        this.balls = BALLS
         this.currentBall = 0
 
         this.scoreDisplay = this.add

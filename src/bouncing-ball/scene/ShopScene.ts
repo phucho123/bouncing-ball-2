@@ -1,4 +1,4 @@
-import { BALL_SIZE, CANVAS_WIDTH } from '../constant/constant'
+import { BALLS, BALLS_PRICE, BALL_SIZE, CANVAS_WIDTH } from '../constant/constant'
 
 export class ShopScene extends Phaser.Scene {
     public static chosenBall: number
@@ -15,17 +15,8 @@ export class ShopScene extends Phaser.Scene {
 
     public create(): void {
         this.balls = []
-        this.ballKey = [
-            'normalball',
-            'basketball',
-            'football',
-            'volleyball',
-            'tennisball',
-            'pokeball',
-            'cannonbolt',
-            'dragonball',
-        ]
-        this.gemNeedToPay = [0, 10, 20, 30, 40, 50, 60, 70]
+        this.ballKey = BALLS
+        this.gemNeedToPay = BALLS_PRICE
         this.gemNeedToPayDisplay = []
         this.getBoughtBall()
 

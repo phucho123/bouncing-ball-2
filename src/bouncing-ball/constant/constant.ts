@@ -9,3 +9,14 @@ export const FALL_SPEED = 10
 export const TIME_TO_CHANGE_COLOR = 5
 export const TIME_TO_SPAWN_OBJECT = 60
 export const FLOOR_DOWN_SPEED = 2
+export const BALLS = [
+    'normalball',
+    'basketball',
+    'football',
+    'volleyball',
+    'tennisball',
+    'pokeball',
+    'cannonbolt',
+    'dragonball',
+]
+export const BALLS_PRICE = [0, 10, 20, 30, 40, 50, 60, 70]
