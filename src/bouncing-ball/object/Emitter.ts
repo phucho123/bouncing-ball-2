@@ -3,7 +3,7 @@ import { DELTA_TIME } from '../constant/constant'
 export class Emitter {
     public hitEmitter: Phaser.GameObjects.Particles.ParticleEmitter
     public fireEmitter: Phaser.GameObjects.Particles.ParticleEmitter
-    private scene
+    private scene: Phaser.Scene
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
