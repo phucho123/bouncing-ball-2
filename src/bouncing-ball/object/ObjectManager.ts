@@ -89,8 +89,8 @@ export class ObjectManager {
     }
 
     public initial(): void {
-        for (let i = 2; i <= 4; i++) {
-            this.createObject(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
+        for (let i = 1; i <= 2; i++) {
+            this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), CANVAS_WIDTH, 1)
         }
         this.initialBall()
         this.emitter = new Emitter(this.scene)
@@ -382,8 +382,8 @@ export class ObjectManager {
 
         this.audioManager.pauseFireAudio()
 
-        for (let i = 2; i <= 4; i++) {
-            this.createObject(Math.floor((i * CANVAS_WIDTH) / 4), CANVAS_WIDTH, 1)
+        for (let i = 1; i <= 2; i++) {
+            this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), CANVAS_WIDTH, 1)
         }
 
         this.ball.setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
