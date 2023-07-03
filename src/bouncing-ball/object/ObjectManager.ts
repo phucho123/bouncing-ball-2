@@ -124,7 +124,7 @@ export class ObjectManager {
             })
         this.scene.input.on('pointerdown', () => {
             if (!PlayScene.gameOver)
-                this.ball.setVelocity(0, (this.fallSpeed * this.delta) / DELTA_TIME)
+                this.ball.setVelocity(0, Math.min((this.fallSpeed * this.delta) / DELTA_TIME, 12))
         })
     }
 
