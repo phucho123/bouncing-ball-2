@@ -36,4 +36,34 @@ export class Gem extends Object {
             newGem.setPosition(x, y - newGem.displayHeight / 2)
         }
     }
+
+    public createWithTiled(x: number, y: number, type: string): void {
+        if (type == '') return
+
+        let newGem: Phaser.GameObjects.Image
+        const newGemFilter = this.arr.filter(
+            (gem) => gem.x + gem.displayWidth / 2 <= 0 || gem.alpha == 0
+        )
+        if (newGemFilter.length == 0) {
+            newGem = this.scene.add.image(x, y, 'gem')
+            newGem.setScale(20 / newGem.width)
+            this.arr.push(newGem)
+            console.log('create New Gem')
+        } else {
+            newGem = newGemFilter[0] as Phaser.GameObjects.Image
+        }
+
+        if (newGem) {
+            if (type == 'firegem') {
+                newGem.setTexture('firegem')
+                newGem.setScale(20 / newGem.width)
+            } else {
+                newGem.setTexture('gem')
+                newGem.setScale(20 / newGem.width)
+            }
+            newGem.setState(0)
+            newGem.setAlpha(1)
+            newGem.setPosition(x, y - newGem.displayHeight / 2)
+        }
+    }
 }

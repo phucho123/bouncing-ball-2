@@ -4,7 +4,6 @@ import { PlayScene } from '../scene/PlayScene'
 import {
     BALL_SIZE,
     CANVAS_HEIGHT,
-    CANVAS_WIDTH,
     COLOR,
     DELTA_TIME,
     FALL_SPEED,
@@ -22,8 +21,8 @@ import { Floor } from './Floor'
 import { ShopScene } from '../scene/ShopScene'
 import { Emitter } from './Emitter'
 
-export class ObjectManager {
-    public static instance: ObjectManager | null = null
+export class ObjectManagerTiled {
+    public static instance: ObjectManagerTiled | null = null
     private scene: Phaser.Scene
     private gems: Gem
     private spikes: Spike
@@ -81,14 +80,17 @@ export class ObjectManager {
         this.audioManager = AudioManager.getInstance(this.scene)
     }
 
-    public static getInstance(scene: Phaser.Scene): ObjectManager {
-        if (!ObjectManager.instance) {
-            ObjectManager.instance = new ObjectManager(scene)
+    public static getInstance(scene: Phaser.Scene): ObjectManagerTiled {
+        if (!ObjectManagerTiled.instance) {
+            ObjectManagerTiled.instance = new ObjectManagerTiled(scene)
         }
-        return ObjectManager.instance
+        return ObjectManagerTiled.instance
     }
 
     public initial(): void {
+        // for (let i = 1; i <= 2; i++) {
+        //     this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
+        // }
         this.initialBall()
         this.emitter = new Emitter(this.scene)
         this.audioManager.init()
@@ -103,7 +105,7 @@ export class ObjectManager {
             .setBounce(0)
             .setMass(3)
             .setDepth(5)
-            .setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
+            .setPosition(250, BALL_SIZE / 2 + 10)
             .setOnCollide(() => {
                 this.audioManager.playHitAudio()
                 this.ball.setVelocity(0, Math.max((this.jumpSpeed * this.delta) / DELTA_TIME, -12))
@@ -140,7 +142,7 @@ export class ObjectManager {
                 })
                 if (gem[0]) gem[0].setState(1)
 
-                const spike = this.spikes.get().filter((spike) => {
+                const spikes = this.spikes.get().filter((spike) => {
                     if (newFloor)
                         return (
                             spike.x <= newFloor.x + newFloor.displayWidth / 2 &&
@@ -148,7 +150,9 @@ export class ObjectManager {
                         )
                 })
 
-                if (spike[0]) spike[0].setState(1)
+                if (spikes.length) {
+                    spikes.forEach((spike) => spike.setState(1))
+                }
 
                 this.hitPoints.create(
                     newFloor.x,
@@ -218,10 +222,16 @@ export class ObjectManager {
         })
     }
 
-    public createObject(x: number | null, height: number, scaleX: number): void {
+    public createObject(
+        x: number | null,
+        height: number,
+        width: number,
+        spikeDir: string,
+        gemType: string
+    ): void {
         this.countTimeToSpawnObject = this.timeToSpawnObject
         const y = CANVAS_HEIGHT - height
-        const newFloor = this.floors.create(x, y, scaleX)
+        const newFloor = this.floors.create(x, y, width / 48)
         if (newFloor) {
             if (newFloor.state == -1) {
                 this.setFloorCollideEvent(newFloor)
@@ -234,20 +244,35 @@ export class ObjectManager {
                 CANVAS_HEIGHT - newFloor.y - newFloor.displayHeight / 2,
                 this.colors[this.colorIndex]
             )
-            this.gems.create(newFloor.x, newFloor.y - newFloor.displayHeight / 2)
-            this.spikes.create(
-                newFloor.x,
-                newFloor.y - newFloor.displayHeight / 2,
-                newFloor.displayWidth,
-                newFloor.scaleX
-            )
+            this.gems.createWithTiled(newFloor.x, newFloor.y - newFloor.displayHeight / 2, gemType)
+            if (spikeDir == 'both') {
+                this.spikes.createWithTile(
+                    newFloor.x,
+                    newFloor.y - newFloor.displayHeight / 2,
+                    newFloor.displayWidth,
+                    'left'
+                )
+                this.spikes.createWithTile(
+                    newFloor.x,
+                    newFloor.y - newFloor.displayHeight / 2,
+                    newFloor.displayWidth,
+                    'right'
+                )
+            } else {
+                this.spikes.createWithTile(
+                    newFloor.x,
+                    newFloor.y - newFloor.displayHeight / 2,
+                    newFloor.displayWidth,
+                    spikeDir
+                )
+            }
         }
     }
 
     public handleGameOver(): void {
         GameOverScene.score = PlayScene.score
         this.restart()
-        this.scene.scene.switch('Game Over Scene')
+        // this.scene.scene.switch('Game Over Scene')
     }
 
     public changeColor(): void {
@@ -293,7 +318,10 @@ export class ObjectManager {
             )
         }
 
-        if (this.ball.x != 0) this.ball.setX(CANVAS_WIDTH / 2)
+        if (this.ball.x != 0) {
+            // this.ball.setX(CANVAS_WIDTH / 2)
+            this.ball.setX(250)
+        }
 
         this.floors.move(
             (this.floorSpeed * this.delta) / DELTA_TIME,
@@ -348,13 +376,13 @@ export class ObjectManager {
             }
 
             this.countTimeToSpawnObject -= Math.round((1 * this.delta) / DELTA_TIME)
-            if (this.countTimeToSpawnObject <= 0) {
-                this.createObject(
-                    null,
-                    Phaser.Math.Between(CANVAS_HEIGHT * 0.3, CANVAS_HEIGHT * 0.5),
-                    Phaser.Math.FloatBetween(1, 2.5) / 2
-                )
-            }
+            // if (this.countTimeToSpawnObject <= 0) {
+            //     this.createObject(
+            //         null,
+            //         Phaser.Math.Between(CANVAS_HEIGHT * 0.3, CANVAS_HEIGHT * 0.5),
+            //         Phaser.Math.FloatBetween(1, 2.5) / 2
+            //     )
+            // }
             this.move()
         }
     }
@@ -380,11 +408,12 @@ export class ObjectManager {
 
         this.audioManager.pauseFireAudio()
 
-        for (let i = 1; i <= 2; i++) {
-            this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
-        }
+        // for (let i = 1; i <= 2; i++) {
+        //     this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
+        // }
 
-        this.ball.setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
+        // this.ball.setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
+        this.ball.setPosition(250, BALL_SIZE / 2 + 10)
     }
 
     public changeBall(ball: string): void {

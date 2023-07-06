@@ -8,7 +8,6 @@ export class StartScene extends Phaser.Scene {
     }
 
     public create(): void {
-        console.log(CANVAS_WIDTH / 2)
         this.createButton()
         this.text = this.add
             .text(60, 100, 'Bouncing\n   Ball 2', {

@@ -1,6 +1,6 @@
-import { ObjectManager } from '../object/ObjectManager'
 import { ShopScene } from './ShopScene'
 import { BALLS, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from '../constant/constant'
+import { ObjectManagerTiled } from '../object/ObjectManagerTiled'
 
 export class PlayScene extends Phaser.Scene {
     public static start: boolean
@@ -9,10 +9,11 @@ export class PlayScene extends Phaser.Scene {
     public static highScore: number
     private scoreDisplay: Phaser.GameObjects.Text
     private highScoreDisplay: Phaser.GameObjects.Text
-    private objectManager: ObjectManager
+    private objectManager: ObjectManagerTiled
     private balls: string[]
     private currentBall: number
     private map: Phaser.Tilemaps.Tilemap
+    private tiledObject: Phaser.Types.Tilemaps.TiledObject[]
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -25,7 +26,7 @@ export class PlayScene extends Phaser.Scene {
         PlayScene.start = false
         PlayScene.gameOver = false
         PlayScene.score = 0
-        this.objectManager = ObjectManager.getInstance(this)
+        this.objectManager = ObjectManagerTiled.getInstance(this)
         this.balls = BALLS
         this.currentBall = 0
 
@@ -48,8 +49,9 @@ export class PlayScene extends Phaser.Scene {
                 color: '#000000',
             })
             .setOrigin(0.5, 0)
-        this.objectManager.initial()
+
         this.loadObjectsFromTilemap()
+        this.objectManager.initial()
     }
 
     public update(time: number, delta: number): void {
@@ -63,7 +65,10 @@ export class PlayScene extends Phaser.Scene {
             this.highScoreDisplay.setText(`HighScore: ${PlayScene.score}`)
         }
 
-        if (PlayScene.gameOver) this.objectManager.handleGameOver()
+        if (PlayScene.gameOver) {
+            // this.objectManager.handleGameOver()
+            this.restart()
+        }
 
         this.objectManager.changeColor()
         this.scoreDisplay.setText(`${(this, PlayScene.score)}`)
@@ -73,18 +78,46 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private loadObjectsFromTilemap(): void {
-        // get the object layer in the tilemap named 'objects'
         const objects = this.map.getObjectLayer('objects')
         if (objects) {
-            console.log(objects.objects)
-            const objectList = objects.objects
-            objectList.forEach((object) => {
+            this.tiledObject = objects.objects
+            this.tiledObject.forEach((object) => {
                 if (object.type == 'pipe') {
-                    if (object.x && object.height && object.x && object.width) {
-                        this.objectManager.createObject(object.x, object.height, object.width / 48)
+                    if (
+                        object.x &&
+                        object.height &&
+                        object.x &&
+                        object.width &&
+                        object.properties
+                    ) {
+                        this.objectManager.createObject(
+                            object.x,
+                            object.height,
+                            object.width,
+                            object.properties[1].value,
+                            object.properties[0].value
+                        )
                     }
                 }
             })
         }
+    }
+
+    private restart() {
+        this.objectManager.handleGameOver()
+        this.tiledObject.forEach((object) => {
+            if (object.type == 'pipe') {
+                if (object.x && object.height && object.x && object.width && object.properties) {
+                    this.objectManager.createObject(
+                        object.x,
+                        object.height,
+                        object.width,
+                        object.properties[1].value,
+                        object.properties[0].value
+                    )
+                }
+            }
+        })
+        this.scene.switch('Game Over Scene')
     }
 }
