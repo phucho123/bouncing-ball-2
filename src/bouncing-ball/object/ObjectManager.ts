@@ -89,9 +89,9 @@ export class ObjectManager {
     }
 
     public initial(): void {
-        for (let i = 1; i <= 2; i++) {
-            this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), CANVAS_WIDTH, 1)
-        }
+        // for (let i = 1; i <= 2; i++) {
+        //     this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
+        // }
         this.initialBall()
         this.emitter = new Emitter(this.scene)
         this.audioManager.init()
@@ -221,9 +221,11 @@ export class ObjectManager {
         })
     }
 
-    public createObject(x: number | null, y: number, scaleX: number): void {
+    public createObject(x: number | null, height: number, scaleX: number): void {
         this.countTimeToSpawnObject = this.timeToSpawnObject
+        const y = CANVAS_HEIGHT - height
         const newFloor = this.floors.create(x, y, scaleX)
+        console.log(newFloor?.displayWidth)
         if (newFloor) {
             if (newFloor.state == -1) {
                 this.setFloorCollideEvent(newFloor)
@@ -231,9 +233,9 @@ export class ObjectManager {
             newFloor.setState(0)
             this.pipes.create(
                 newFloor.x,
-                newFloor.y + newFloor.displayHeight / 2 + CANVAS_HEIGHT / 2,
+                newFloor.y + newFloor.displayHeight / 2,
                 newFloor.displayWidth,
-                CANVAS_HEIGHT,
+                CANVAS_HEIGHT - newFloor.y - newFloor.displayHeight / 2,
                 this.colors[this.colorIndex]
             )
             this.gems.create(newFloor.x, newFloor.y - newFloor.displayHeight / 2)
@@ -353,7 +355,7 @@ export class ObjectManager {
             if (this.countTimeToSpawnObject <= 0) {
                 this.createObject(
                     null,
-                    Phaser.Math.Between(CANVAS_HEIGHT * 0.5, CANVAS_HEIGHT * 0.6),
+                    Phaser.Math.Between(CANVAS_HEIGHT * 0.3, CANVAS_HEIGHT * 0.5),
                     Phaser.Math.FloatBetween(1, 2.5) / 2
                 )
             }
@@ -383,7 +385,7 @@ export class ObjectManager {
         this.audioManager.pauseFireAudio()
 
         for (let i = 1; i <= 2; i++) {
-            this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), CANVAS_WIDTH, 1)
+            this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
         }
 
         this.ball.setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)

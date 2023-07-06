@@ -12,6 +12,7 @@ export class PlayScene extends Phaser.Scene {
     private objectManager: ObjectManager
     private balls: string[]
     private currentBall: number
+    private map: Phaser.Tilemaps.Tilemap
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -19,6 +20,7 @@ export class PlayScene extends Phaser.Scene {
 
     public create(): void {
         console.log('create play scene')
+        this.map = this.make.tilemap({ key: 'level1' })
         this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false
         PlayScene.gameOver = false
@@ -47,6 +49,7 @@ export class PlayScene extends Phaser.Scene {
             })
             .setOrigin(0.5, 0)
         this.objectManager.initial()
+        this.loadObjectsFromTilemap()
     }
 
     public update(time: number, delta: number): void {
@@ -67,5 +70,21 @@ export class PlayScene extends Phaser.Scene {
 
         this.objectManager.checkOutOfBound()
         this.objectManager.update(delta)
+    }
+
+    private loadObjectsFromTilemap(): void {
+        // get the object layer in the tilemap named 'objects'
+        const objects = this.map.getObjectLayer('objects')
+        if (objects) {
+            console.log(objects.objects)
+            const objectList = objects.objects
+            objectList.forEach((object) => {
+                if (object.type == 'pipe') {
+                    if (object.x && object.height && object.x && object.width) {
+                        this.objectManager.createObject(object.x, object.height, object.width / 48)
+                    }
+                }
+            })
+        }
     }
 }

@@ -10,7 +10,10 @@ export class Pipe extends Object {
 
         const newPipeFilter = this.arr.filter((pipe) => pipe.x + pipe.displayWidth / 2 <= 0)
         if (newPipeFilter.length == 0) {
-            newPipe = this.scene.add.rectangle(x, y, width, height, 0xff0000).setDepth(0)
+            newPipe = this.scene.add
+                .rectangle(x, y, width, height, 0xff0000)
+                .setDepth(0)
+                .setOrigin(0.5, 0)
             console.log('create New Pipe')
             this.arr.push(newPipe)
         } else {
