@@ -7,7 +7,6 @@ export class PlayScene extends Phaser.Scene {
     public static gameOver: boolean
     public static score: number
     public static highScore: number
-    public static levelup = false
     private scoreDisplay: Phaser.GameObjects.Text
     private highScoreDisplay: Phaser.GameObjects.Text
     private objectManager: ObjectManagerTiled
@@ -15,6 +14,10 @@ export class PlayScene extends Phaser.Scene {
     private currentBall: number
     private map: Phaser.Tilemaps.Tilemap
     private tiledObject: Phaser.Types.Tilemaps.TiledObject[]
+    private levelNotify: Phaser.GameObjects.Text
+    private level: number
+    private levelNotifyTween: Phaser.Tweens.Tween
+    private levelUpTimeout: NodeJS.Timeout
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -22,6 +25,7 @@ export class PlayScene extends Phaser.Scene {
 
     public create(): void {
         console.log('create play scene')
+        this.level = 1
         this.map = this.make.tilemap({ key: 'level1' })
         this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false
@@ -65,10 +69,18 @@ export class PlayScene extends Phaser.Scene {
                 color: '#000000',
             })
             .setOrigin(0.5, 0)
+        this.levelNotify = this.add
+            .text(CANVAS_WIDTH / 2, 100, `Level ${this.level}`, {
+                fontSize: '64px',
+                fontFamily: 'Arial',
+                color: '#0000ff',
+            })
+            .setOrigin(0.5, 0)
+            .setAlpha(0)
+            .setDepth(10)
 
-        this.loadObjectsFromTilemap()
         this.objectManager.initial()
-        setTimeout(() => this.levelUp('level2'), 30000)
+        this.restart()
     }
 
     public update(time: number, delta: number): void {
@@ -99,8 +111,6 @@ export class PlayScene extends Phaser.Scene {
 
         this.objectManager.checkOutOfBound()
         this.objectManager.update(delta)
-
-        if (PlayScene.levelup) this.levelUp('level2')
     }
 
     private loadObjectsFromTilemap(): void {
@@ -130,26 +140,32 @@ export class PlayScene extends Phaser.Scene {
     }
 
     private restart() {
+        clearTimeout(this.levelUpTimeout)
         this.objectManager.handleGameOver()
-        this.tiledObject.forEach((object) => {
-            if (object.type == 'pipe') {
-                if (object.x && object.height && object.x && object.width && object.properties) {
-                    this.objectManager.createObject(
-                        object.x,
-                        object.height,
-                        object.width,
-                        object.properties[1].value,
-                        object.properties[0].value
-                    )
-                }
-            }
-        })
+        this.level = 1
+        this.levelUp('level1')
     }
 
     private levelUp(level: string) {
         this.objectManager.restart()
+        this.map.destroy()
         this.map = this.make.tilemap({ key: level })
         this.loadObjectsFromTilemap()
-        PlayScene.levelup = false
+        this.levelNotify.setText(`Level ${this.level}`)
+        if (this.levelNotifyTween) {
+            this.tweens.remove(this.levelNotifyTween)
+            this.levelNotify.setAlpha(0)
+        }
+        this.levelNotifyTween = this.add.tween({
+            targets: this.levelNotify,
+            duration: 300,
+            alpha: 1,
+            yoyo: true,
+            repeat: 3,
+        })
+        this.level = (this.level + 1) % 3 == 0 ? 1 : (this.level + 1) % 3
+        this.levelUpTimeout = setTimeout(() => {
+            this.levelUp(`level${this.level}`)
+        }, 30000)
     }
 }
