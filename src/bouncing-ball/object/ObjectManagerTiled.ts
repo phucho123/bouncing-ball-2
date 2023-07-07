@@ -399,6 +399,7 @@ export class ObjectManagerTiled {
         this.comboDisplay.setAlpha(0)
         this.combo = 0
         this.timeToFire = 0
+        this.colorIndex = 0
 
         this.floors.clear()
         this.hitPoints.clear()
