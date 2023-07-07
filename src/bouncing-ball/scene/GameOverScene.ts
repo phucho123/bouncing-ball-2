@@ -24,7 +24,6 @@ export class GameOverScene extends Phaser.Scene {
             .setInteractive()
             .setScale(0.2)
             .on('pointerdown', () => {
-                // this.scene.sleep('Game Over Scene')
                 if (this.scene.isSleeping('Play Scene')) {
                     this.scene.sleep('Game Over Scene')
                     this.scene.wake('Play Scene')
@@ -40,7 +39,6 @@ export class GameOverScene extends Phaser.Scene {
             .setScale(0.2)
             .setOrigin(0.5, 0)
             .on('pointerdown', () => {
-                // this.scene.sleep('Game Over Scene')
                 if (this.scene.isSleeping('Start Scene')) {
                     this.scene.sleep('Game Over Scene')
                     this.scene.wake('Start Scene')

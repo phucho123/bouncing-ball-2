@@ -33,28 +33,9 @@ export class PauseScene extends Phaser.Scene {
             .setOrigin(0.5, 0)
             .setInteractive()
             .on('pointerdown', () => {
-                // this.scene.stop('Play Scene')
                 this.scene.resume('Play Scene')
                 this.scene.setVisible(false, 'Play Scene')
-                // this.scene.sleep('Play Scene')
-                // this.scene.switch('Play Scene')
-                // this.scene.sleep('Pause Scene')
                 this.scene.switch('Start Scene')
-                // this.scene.start('Start Scene')
             })
-        // this.add
-        //     .text(box.x, box.y - box.displayHeight / 2 + 210, 'Setting', {
-        //         fontFamily: 'Arial',
-        //         color: '0x000000',
-        //         fontSize: '32px',
-        //     })
-        //     .setOrigin(0.5, 0)
-        // this.add
-        //     .text(box.x, box.y - box.displayHeight / 2 + 310, 'Shop', {
-        //         fontFamily: 'Arial',
-        //         color: '0x000000',
-        //         fontSize: '32px',
-        //     })
-        //     .setOrigin(0.5, 0)
     }
 }

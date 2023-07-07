@@ -88,12 +88,8 @@ export class ObjectManagerTiled {
     }
 
     public initial(): void {
-        // for (let i = 1; i <= 2; i++) {
-        //     this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
-        // }
         this.initialBall()
         this.emitter = new Emitter(this.scene)
-        // this.audioManager.init()
     }
 
     public initialBall(): void {
@@ -272,7 +268,6 @@ export class ObjectManagerTiled {
     public handleGameOver(): void {
         GameOverScene.score = PlayScene.score
         this.restart()
-        // this.scene.scene.switch('Game Over Scene')
     }
 
     public changeColor(): void {
@@ -319,7 +314,6 @@ export class ObjectManagerTiled {
         }
 
         if (this.ball.x != 0) {
-            // this.ball.setX(CANVAS_WIDTH / 2)
             this.ball.setX(250)
         }
 
@@ -376,13 +370,6 @@ export class ObjectManagerTiled {
             }
 
             this.countTimeToSpawnObject -= Math.round((1 * this.delta) / DELTA_TIME)
-            // if (this.countTimeToSpawnObject <= 0) {
-            //     this.createObject(
-            //         null,
-            //         Phaser.Math.Between(CANVAS_HEIGHT * 0.3, CANVAS_HEIGHT * 0.5),
-            //         Phaser.Math.FloatBetween(1, 2.5) / 2
-            //     )
-            // }
             this.move()
         }
     }
@@ -410,11 +397,6 @@ export class ObjectManagerTiled {
 
         this.audioManager.pauseFireAudio()
 
-        // for (let i = 1; i <= 2; i++) {
-        //     this.createObject(Math.floor((i * CANVAS_WIDTH) / 2), 300, 1)
-        // }
-
-        // this.ball.setPosition(CANVAS_WIDTH / 2, BALL_SIZE / 2 + 10)
         this.ball.setPosition(250, BALL_SIZE / 2 + 10)
     }
 

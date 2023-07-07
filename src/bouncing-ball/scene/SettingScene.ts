@@ -30,7 +30,7 @@ export class SettingScene extends Phaser.Scene {
             .setOrigin(0, 0)
         const speaker = this.add
             .sprite(CANVAS_WIDTH - 10, 120, 'speaker', 0)
-            .setScale(2)
+            .setScale(1.5)
             .setInteractive()
             .setOrigin(1, 0.5)
         speaker.on('pointerdown', () => {
