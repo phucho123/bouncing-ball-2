@@ -5,6 +5,8 @@ import { StartScene } from '../scene/StartScene'
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../constant/constant'
 import { ShopScene } from '../scene/ShopScene'
 import { LoadingScene } from '../scene/LoadingScene'
+import { PauseScene } from '../scene/PauseScene'
+import { SettingScene } from '../scene/SettingScene'
 
 export const config = {
     type: Phaser.AUTO,
@@ -18,5 +20,13 @@ export const config = {
             enableSleeping: true,
         },
     },
-    scene: [LoadingScene, StartScene, PlayScene, GameOverScene, ShopScene],
+    scene: [
+        LoadingScene,
+        StartScene,
+        PlayScene,
+        GameOverScene,
+        ShopScene,
+        PauseScene,
+        SettingScene,
+    ],
 }

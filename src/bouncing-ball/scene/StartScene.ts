@@ -8,6 +8,7 @@ export class StartScene extends Phaser.Scene {
     }
 
     public create(): void {
+        console.log('Create Start Scene')
         this.createButton()
         this.text = this.add
             .text(60, 100, 'Bouncing\n   Ball 2', {
@@ -57,12 +58,16 @@ export class StartScene extends Phaser.Scene {
                                 yoyo: false,
                                 alpha: 1,
                             })
-                            this.scene.switch('Play Scene')
+                            // if (this.scene.isPaused('Play Scene')) this.scene.stop('Play Scene')
+                            if (this.scene.isSleeping('Play Scene')) {
+                                this.scene.sleep('Start Scene')
+                                this.scene.wake('Play Scene')
+                            } else this.scene.switch('Play Scene')
                         },
                     })
 
                     this.tweens.add({
-                        targets: [startButton, shopButton],
+                        targets: [startButton, shopButton, settingButton],
                         y: 800,
                         duration: 1000,
                         alpha: 0,
@@ -75,5 +80,17 @@ export class StartScene extends Phaser.Scene {
         shopButton.on('pointerdown', () => {
             this.scene.switch('Shop Scene')
         })
+
+        const settingButton = this.add
+            .text(CANVAS_WIDTH / 2, shopButton.y + shopButton.displayHeight / 2 + 100, 'Setting', {
+                fontFamily: 'Arial',
+                fontSize: '32px',
+                color: '#000000',
+            })
+            .setOrigin(0.5)
+            .setInteractive()
+            .on('pointerdown', () => {
+                this.scene.switch('Setting Scene')
+            })
     }
 }

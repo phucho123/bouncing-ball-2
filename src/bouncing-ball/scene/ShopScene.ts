@@ -14,6 +14,7 @@ export class ShopScene extends Phaser.Scene {
     }
 
     public create(): void {
+        console.log('Create Shop Scene')
         this.balls = []
         this.ballKey = BALLS
         this.gemNeedToPay = BALLS_PRICE

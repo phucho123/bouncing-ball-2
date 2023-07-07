@@ -93,7 +93,7 @@ export class ObjectManagerTiled {
         // }
         this.initialBall()
         this.emitter = new Emitter(this.scene)
-        this.audioManager.init()
+        // this.audioManager.init()
     }
 
     public initialBall(): void {
@@ -400,6 +400,7 @@ export class ObjectManagerTiled {
         this.combo = 0
         this.timeToFire = 0
         this.colorIndex = 0
+        this.emitter.setColorHitEmitter('red')
 
         this.floors.clear()
         this.hitPoints.clear()

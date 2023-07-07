@@ -11,6 +11,7 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     public create(): void {
+        console.log('Create Game Over Scene')
         this.add
             .text(CANVAS_WIDTH / 2, 100, 'Game Over', {
                 color: '#000000',
@@ -23,7 +24,11 @@ export class GameOverScene extends Phaser.Scene {
             .setInteractive()
             .setScale(0.2)
             .on('pointerdown', () => {
-                this.scene.switch('Play Scene')
+                // this.scene.sleep('Game Over Scene')
+                if (this.scene.isSleeping('Play Scene')) {
+                    this.scene.sleep('Game Over Scene')
+                    this.scene.wake('Play Scene')
+                } else this.scene.switch('Play Scene')
             })
         this.add
             .image(
@@ -35,7 +40,11 @@ export class GameOverScene extends Phaser.Scene {
             .setScale(0.2)
             .setOrigin(0.5, 0)
             .on('pointerdown', () => {
-                this.scene.switch('Start Scene')
+                // this.scene.sleep('Game Over Scene')
+                if (this.scene.isSleeping('Start Scene')) {
+                    this.scene.sleep('Game Over Scene')
+                    this.scene.wake('Start Scene')
+                } else this.scene.switch('Start Scene')
             })
 
         this.scoreDisplay = this.add

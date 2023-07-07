@@ -21,7 +21,7 @@ export class PlayScene extends Phaser.Scene {
 
     public create(): void {
         console.log('create play scene')
-        this.map = this.make.tilemap({ key: 'level1' })
+        this.map = this.make.tilemap({ key: 'level2' })
         this.matter.world.setGravity(0, 0.4)
         PlayScene.start = false
         PlayScene.gameOver = false
@@ -42,6 +42,21 @@ export class PlayScene extends Phaser.Scene {
             .setDepth(0)
         this.scoreDisplay.setPosition(CANVAS_WIDTH / 2, (CANVAS_HEIGHT / 2) * 0.5)
 
+        this.add
+            .text(10, 10, 'II', {
+                fontSize: '32px',
+                fontFamily: 'Arial',
+                color: '#000000',
+                testString: '123y2',
+            })
+            .setOrigin(0)
+            .setInteractive()
+            .on('pointerdown', () => {
+                this.scene.pause('Play Scene')
+                if (this.scene.isSleeping('Pause Scene')) this.scene.wake('Pause Scene')
+                else this.scene.launch('Pause Scene')
+            })
+
         this.highScoreDisplay = this.add
             .text(CANVAS_WIDTH / 2, 10, `High Score: ${PlayScene.highScore}`, {
                 fontSize: '32px',
@@ -55,6 +70,10 @@ export class PlayScene extends Phaser.Scene {
     }
 
     public update(time: number, delta: number): void {
+        if (!this.scene.isVisible('Play Scene')) {
+            this.restart()
+            this.scene.sleep('Play Scene')
+        }
         this.matter.world.setGravity(0, Math.min((0.5 * delta) / DELTA_TIME, 1.2))
         if (this.currentBall != ShopScene.chosenBall) {
             this.currentBall = ShopScene.chosenBall
@@ -66,8 +85,11 @@ export class PlayScene extends Phaser.Scene {
         }
 
         if (PlayScene.gameOver) {
-            // this.objectManager.handleGameOver()
             this.restart()
+            if (this.scene.isSleeping('Game Over Scene')) {
+                this.scene.sleep('Play Scene')
+                this.scene.wake('Game Over Scene')
+            } else this.scene.switch('Game Over Scene')
         }
 
         this.objectManager.changeColor()
@@ -118,6 +140,5 @@ export class PlayScene extends Phaser.Scene {
                 }
             }
         })
-        this.scene.switch('Game Over Scene')
     }
 }

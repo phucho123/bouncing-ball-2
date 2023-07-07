@@ -9,6 +9,7 @@ export class AudioManager {
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
+        this.init()
     }
 
     public static getInstance(scene: Phaser.Scene): AudioManager {
@@ -69,5 +70,21 @@ export class AudioManager {
 
     public pauseSpikeAudio(): void {
         this.spikeAudio.pause()
+    }
+
+    public mute(): void {
+        this.gemAudio.setMute(true)
+        this.hitAudio.setMute(true)
+        this.dieAudio.setMute(true)
+        this.fireAudio.setMute(true)
+        this.spikeAudio.setMute(true)
+    }
+
+    public unMute(): void {
+        this.gemAudio.setMute(false)
+        this.hitAudio.setMute(false)
+        this.dieAudio.setMute(false)
+        this.fireAudio.setMute(false)
+        this.spikeAudio.setMute(false)
     }
 }
