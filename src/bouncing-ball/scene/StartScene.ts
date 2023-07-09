@@ -61,12 +61,11 @@ export class StartScene extends Phaser.Scene {
                                 yoyo: false,
                                 alpha: 1,
                             })
-                            // if (this.scene.isPaused('Play Scene')) this.scene.stop('Play Scene')
                             if (this.scene.isSleeping('Play Scene')) {
                                 this.scene.sleep('Start Scene')
                                 this.scene.wake('Play Scene')
                             } else this.scene.switch('Play Scene')
-                            this.audioManager.playBM()
+                            // this.audioManager.playBM()
                         },
                     })
 
