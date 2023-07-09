@@ -137,6 +137,11 @@
           "url": "./assets/audios/fire.mp3"
         },
         {
+          "type": "audio",
+          "key": "BM-audio",
+          "url": "./assets/audios/background_music.mp3"
+        },
+        {
           "type": "tilemapTiledJSON",
           "key": "level1",
           "url": "./assets/maps/level1.json"

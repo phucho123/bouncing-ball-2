@@ -1,7 +1,9 @@
+import { AudioManager } from '../audio/AudioManager'
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constant/constant'
 
 export class StartScene extends Phaser.Scene {
     private text: Phaser.GameObjects.Text
+    private audioManager: AudioManager
 
     constructor() {
         super({ key: 'Start Scene' })
@@ -9,6 +11,7 @@ export class StartScene extends Phaser.Scene {
 
     public create(): void {
         console.log('Create Start Scene')
+        this.audioManager = AudioManager.getInstance(this.scene.get('Play Scene'))
         this.createButton()
         this.text = this.add
             .text(60, 100, 'Bouncing\n   Ball 2', {
@@ -63,6 +66,7 @@ export class StartScene extends Phaser.Scene {
                                 this.scene.sleep('Start Scene')
                                 this.scene.wake('Play Scene')
                             } else this.scene.switch('Play Scene')
+                            this.audioManager.playBM()
                         },
                     })
 

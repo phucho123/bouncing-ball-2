@@ -5,6 +5,7 @@ export class AudioManager {
     private dieAudio: Phaser.Sound.NoAudioSound
     private fireAudio: Phaser.Sound.NoAudioSound
     private spikeAudio: Phaser.Sound.NoAudioSound
+    private BMAudio: Phaser.Sound.NoAudioSound
     public static instance: AudioManager | null = null
 
     constructor(scene: Phaser.Scene) {
@@ -13,7 +14,8 @@ export class AudioManager {
     }
 
     public static getInstance(scene: Phaser.Scene): AudioManager {
-        if (!AudioManager.instance) {
+        if (AudioManager.instance == null) {
+            console.log('Create new Audio Manager')
             AudioManager.instance = new AudioManager(scene)
         }
         return AudioManager.instance
@@ -30,6 +32,8 @@ export class AudioManager {
             .setLoop(true) as Phaser.Sound.NoAudioSound
         this.spikeAudio = this.scene.sound.add('spike-audio') as Phaser.Sound.NoAudioSound
         this.spikeAudio.setRate(1.5)
+        this.BMAudio = this.scene.sound.add('BM-audio') as Phaser.Sound.NoAudioSound
+        this.BMAudio.setVolume(0.5)
     }
 
     public playGemAudio(): void {
@@ -72,12 +76,29 @@ export class AudioManager {
         this.spikeAudio.pause()
     }
 
+    public playBM(): void {
+        this.BMAudio.play()
+    }
+
+    public stopBM(): void {
+        this.BMAudio.stop()
+    }
+
+    public pauseBM(): void {
+        this.BMAudio.pause()
+    }
+
+    public resumeBM(): void {
+        this.BMAudio.resume()
+    }
+
     public mute(): void {
         this.gemAudio.setMute(true)
         this.hitAudio.setMute(true)
         this.dieAudio.setMute(true)
         this.fireAudio.setMute(true)
         this.spikeAudio.setMute(true)
+        this.BMAudio.setMute(true)
     }
 
     public unMute(): void {
@@ -86,5 +107,33 @@ export class AudioManager {
         this.dieAudio.setMute(false)
         this.fireAudio.setMute(false)
         this.spikeAudio.setMute(false)
+        this.BMAudio.setMute(false)
+    }
+
+    public pauseSound(): void {
+        this.gemAudio.pause()
+        this.hitAudio.pause()
+        this.dieAudio.pause()
+        this.fireAudio.pause()
+        this.spikeAudio.pause()
+        this.BMAudio.pause()
+    }
+
+    public resumeSound(): void {
+        this.gemAudio.resume()
+        this.hitAudio.resume()
+        this.dieAudio.resume()
+        this.fireAudio.resume()
+        this.spikeAudio.resume()
+        this.BMAudio.resume()
+    }
+
+    public stopSound(): void {
+        this.gemAudio.stop()
+        this.hitAudio.stop()
+        this.dieAudio.stop()
+        this.fireAudio.stop()
+        this.spikeAudio.stop()
+        this.BMAudio.stop()
     }
 }

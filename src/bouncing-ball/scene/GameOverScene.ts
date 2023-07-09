@@ -1,10 +1,12 @@
 import { PlayScene } from './PlayScene'
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constant/constant'
+import { AudioManager } from '../audio/AudioManager'
 
 export class GameOverScene extends Phaser.Scene {
     public static score: number
     private scoreDisplay: Phaser.GameObjects.Text
     private highScoreDisplay: Phaser.GameObjects.Text
+    private audioManager: AudioManager
 
     constructor() {
         super({ key: 'Game Over Scene' })
@@ -12,6 +14,7 @@ export class GameOverScene extends Phaser.Scene {
 
     public create(): void {
         console.log('Create Game Over Scene')
+        this.audioManager = AudioManager.getInstance(this.scene.get('Play Scene'))
         this.add
             .text(CANVAS_WIDTH / 2, 100, 'Game Over', {
                 color: '#000000',
@@ -28,6 +31,8 @@ export class GameOverScene extends Phaser.Scene {
                     this.scene.sleep('Game Over Scene')
                     this.scene.wake('Play Scene')
                 } else this.scene.switch('Play Scene')
+
+                this.audioManager.playBM()
             })
         this.add
             .image(

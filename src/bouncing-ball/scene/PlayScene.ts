@@ -1,6 +1,7 @@
 import { ShopScene } from './ShopScene'
 import { BALLS, CANVAS_HEIGHT, CANVAS_WIDTH, DELTA_TIME } from '../constant/constant'
 import { ObjectManagerTiled } from '../object/ObjectManagerTiled'
+import { AudioManager } from '../audio/AudioManager'
 
 export class PlayScene extends Phaser.Scene {
     public static start: boolean
@@ -18,6 +19,7 @@ export class PlayScene extends Phaser.Scene {
     private level: number
     private levelNotifyTween: Phaser.Tweens.Tween
     private levelUpTimeout: NodeJS.Timeout
+    private audioManager: AudioManager
 
     constructor() {
         super({ key: 'Play Scene' })
@@ -25,6 +27,7 @@ export class PlayScene extends Phaser.Scene {
 
     public create(): void {
         console.log('create play scene')
+        this.audioManager = AudioManager.getInstance(this)
         this.level = 1
         this.map = this.make.tilemap({ key: 'level1' })
         this.matter.world.setGravity(0, 0.4)
@@ -60,6 +63,7 @@ export class PlayScene extends Phaser.Scene {
                 this.scene.pause('Play Scene')
                 if (this.scene.isSleeping('Pause Scene')) this.scene.wake('Pause Scene')
                 else this.scene.launch('Pause Scene')
+                this.audioManager.pauseSound()
             })
 
         this.highScoreDisplay = this.add
@@ -80,12 +84,14 @@ export class PlayScene extends Phaser.Scene {
             .setDepth(10)
 
         this.objectManager.initial()
-        this.restart()
+        this.levelUp('level1')
+        this.audioManager.playBM()
     }
 
     public update(time: number, delta: number): void {
         if (!this.scene.isVisible('Play Scene')) {
             this.restart()
+            this.levelUp('level1')
             this.scene.sleep('Play Scene')
         }
         this.matter.world.setGravity(0, Math.min((0.5 * delta) / DELTA_TIME, 1.2))
@@ -100,6 +106,8 @@ export class PlayScene extends Phaser.Scene {
 
         if (PlayScene.gameOver) {
             this.restart()
+            this.levelUp('level1')
+            this.audioManager.stopBM()
             if (this.scene.isSleeping('Game Over Scene')) {
                 this.scene.sleep('Play Scene')
                 this.scene.wake('Game Over Scene')
@@ -143,10 +151,11 @@ export class PlayScene extends Phaser.Scene {
         clearTimeout(this.levelUpTimeout)
         this.objectManager.handleGameOver()
         this.level = 1
-        this.levelUp('level1')
     }
 
     private levelUp(level: string) {
+        this.audioManager.stopBM()
+        this.audioManager.playBM()
         this.objectManager.restart()
         this.map.destroy()
         this.map = this.make.tilemap({ key: level })
@@ -166,6 +175,6 @@ export class PlayScene extends Phaser.Scene {
         this.level = (this.level + 1) % 3 == 0 ? 1 : (this.level + 1) % 3
         this.levelUpTimeout = setTimeout(() => {
             this.levelUp(`level${this.level}`)
-        }, 30000)
+        }, 40000)
     }
 }

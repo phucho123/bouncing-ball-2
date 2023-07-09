@@ -329,7 +329,6 @@ export class ObjectManagerTiled {
             (this.floorSpeed * this.delta) / DELTA_TIME,
             (this.floorDownSpeed * this.delta) / DELTA_TIME
         )
-
         this.gems.move(
             (this.floorSpeed * this.delta) / DELTA_TIME,
             (this.floorDownSpeed * this.delta) / DELTA_TIME
