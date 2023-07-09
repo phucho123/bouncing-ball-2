@@ -1,0 +1,166 @@
+{
+    "preload": {
+      "files": [
+        {
+          "type": "image",
+          "key": "normalball",
+          "url": "./assets/sprites/ball.png"
+        },
+        {
+          "type": "image",
+          "key": "basketball",
+          "url": "./assets/images/ball.png"
+        },
+        {
+          "type": "image",
+          "key": "pokeball",
+          "url": "./assets/images/poke-ball.png"
+        },
+        {
+          "type": "image",
+          "key": "football",
+          "url": "./assets/images/football.png"
+        },
+        {
+          "type": "image",
+          "key": "volleyball",
+          "url": "./assets/images/volleyball.png"
+        },
+        {
+          "type": "image",
+          "key": "tennisball",
+          "url": "./assets/images/tennisball.png"
+        },
+        {
+          "type": "image",
+          "key": "cannonbolt",
+          "url": "./assets/images/cannonbolt.png"
+        },
+        {
+          "type": "image",
+          "key": "dragonball",
+          "url": "./assets/images/dragonball.png"
+        },
+        {
+          "type": "image",
+          "key": "floor",
+          "url": "./assets/images/floor.png"
+        },
+        {
+          "type": "image",
+          "key": "gem",
+          "url": "./assets/images/gem.png"
+        },
+        {
+          "type": "image",
+          "key": "spike",
+          "url": "./assets/images/triangle.png"
+        },
+        {
+          "type": "image",
+          "key": "red",
+          "url": "./assets/images/red-partical.png"
+        },
+        {
+          "type": "image",
+          "key": "blue",
+          "url": "./assets/images/blue-partical.png"
+        },
+        {
+          "type": "image",
+          "key": "orange",
+          "url": "./assets/images/orange-partical.png"
+        },
+        {
+          "type": "image",
+          "key": "green",
+          "url": "./assets/images/green-partical.png"
+        },
+        {
+          "type": "image",
+          "key": "whitefire",
+          "url": "./assets/images/whitefire.png"
+        },
+        {
+          "type": "image",
+          "key": "firegem",
+          "url": "./assets/images/fire-gem.png"
+        },
+        {
+          "type": "image",
+          "key": "start-button",
+          "url": "./assets/images/start-button.png"
+        },
+        {
+          "type": "image",
+          "key": "shop-button",
+          "url": "./assets/images/shop.png"
+        },
+        {
+          "type": "image",
+          "key": "replay-button",
+          "url": "./assets/images/replay.png"
+        },
+        {
+          "type": "image",
+          "key": "home-button",
+          "url": "./assets/images/home.png"
+        },
+        {
+          "type": "image",
+          "key": "back",
+          "url": "./assets/images/back.png"
+        },
+        {
+          "type": "audio",
+          "key": "gem-audio",
+          "url": "./assets/audios/coin.wav"
+        },
+        {
+          "type": "audio",
+          "key": "hit-audio",
+          "url": "./assets/audios/point.wav"
+        },
+        {
+          "type": "audio",
+          "key": "die-audio",
+          "url": "./assets/audios/die.wav"
+        },
+        {
+          "type": "audio",
+          "key": "spike-audio",
+          "url": "./assets/audios/hit.wav"
+        },
+        {
+          "type": "audio",
+          "key": "fire-audio",
+          "url": "./assets/audios/fire.mp3"
+        },
+        {
+          "type": "audio",
+          "key": "BM-audio",
+          "url": "./assets/audios/background_music.mp3"
+        },
+        {
+          "type": "tilemapTiledJSON",
+          "key": "level1",
+          "url": "./assets/maps/level1.json"
+        },
+        {
+          "type": "tilemapTiledJSON",
+          "key": "level2",
+          "url": "./assets/maps/level2.json"
+        },
+        {
+          "type": "spritesheet",
+          "key": "speaker",
+          "url": "./assets/images/speaker.png",
+          "frameConfig": {
+            "frameWidth": 32,
+            "frameHeight": 24
+          }
+        }
+      ]
+    }
+}
+  
