@@ -32,7 +32,7 @@ export class GameOverScene extends Phaser.Scene {
                     this.scene.wake('Play Scene')
                 } else this.scene.switch('Play Scene')
 
-                // this.audioManager.playBM()
+                this.audioManager.playBM()
             })
         this.add
             .image(
