@@ -92,6 +92,7 @@ export class PlayScene extends Phaser.Scene {
         if (!this.scene.isVisible('Play Scene')) {
             this.restart()
             this.levelUp('level1')
+            this.audioManager.stopSound()
             this.scene.sleep('Play Scene')
         }
         this.matter.world.setGravity(0, Math.min((0.5 * delta) / DELTA_TIME, 1.2))
