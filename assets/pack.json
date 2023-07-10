@@ -139,7 +139,7 @@
         {
           "type": "audio",
           "key": "BM-audio",
-          "url": "./assets/audios"
+          "url": "./assets/audios/background_music.mp3"
         },
         {
           "type": "tilemapTiledJSON",
